@@ -1,21 +1,18 @@
-ADD
-ADDI
-SUB
-SUBI
-MUL
-MULI
-DIV
-DIVI
-AND
-XOR
-OR
-LD
-LDC
-STR
-STRC
-CMP
-JMP
-BR
-BEQ
-BLT
-HALT
+ADD rd, ra, rb          # RF[rd] = RF[ra] + RF[rb]
+ADDI rd, ra, x          # RF[rd] = RF[ra] + x                                                           (where 'x' is an immidiate constant)
+SUB rd, ra, rb          # RF[rd] = RF[ra] - RF[rb] 
+SUBI rd, ra, x          # RF[rd] = RF[ra] - x                                                           (where 'x' is an immidiate constant)
+MUL rd, ra, rb          # RF[rd] = RF[ra] * RF[rb]
+MULI rd, ra, x          # RF[rd] = RF[ra] * x                                                           (where 'x' is an immidiate constant)
+DIV rd, ra, rb          # RF[rd] = RF[ra] / RF[rb]                                                      (rounds to nearest int)
+DIVI rd, ra, x          # RF[rd] = RF[ra] / x                                                           (where 'x' is an immidiate constant)  (rounds to nearest int)
+LD rd, ra, x            # RF[rd] = MEM[ RF[ra] + x ]                                                    (where 'x' is an immidiate constant)
+LDC rd, x               # RF[rd] = MEM[ x ]                                                             (where 'x' is an immidiate constant)
+STR ra, rd, x           # MEM[ RF[rd] + x ] = RF[ra]                                                    (where 'x' is an immidiate constant)
+STRC ra, x              # MEM[ x ] = RF[ra]                                                             (where 'x' is an immidiate constant)
+CMP rd, ra, rb          # if RF[ra] > RF[rb] then RF[rd] = 1;    if RF[ra] = RF[rb] then RF[rd] = 0;     if RF[ra] < RF[rb] then RF[rd] = -1;
+JMP x                   # PC += x                                                                       (where 'x' is an immidiate constant)
+BR x                    # PC = x                                                                        (where 'x' is an immidiate constant)
+BEQ ra, rb, x           # if RF[ra] = RF[rb] then PC = x;                                               (where 'x' is an immidiate constant)
+BLT ra, rb, x           # if RF[ra] < RF[rb] then PC = x;                                               (where 'x' is an immidiate constant)
+HALT                    # finished = 1

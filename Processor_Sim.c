@@ -10,7 +10,7 @@ int RF[32];
 int MEM[1024];
 int INSTR[512];
 
-enum instruction{ADD, ADDI, SUB, SUBI, MUL, MULI, DIV, DIVI, AND, XOR, OR, LD, LDC, STR, STRC, CMP, JMP, BR, BEQ, BLT, HALT};
+enum instruction{ADD, ADDI, SUB, SUBI, MUL, MULI, DIV, DIVI, LD, LDC, STR, STRC, CMP, JMP, BR, BEQ, BLT, HALT};
 
 int main(int argc, char const *argv[])
 {

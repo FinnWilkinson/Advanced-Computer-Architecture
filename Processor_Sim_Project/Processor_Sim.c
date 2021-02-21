@@ -182,26 +182,109 @@ void printSysInfo(){
     for (int i = 0; i < 10; i++)
     {
         printf("a[%d] = %d \n", i, MEM[i]);
-        printf("b[%d] = %d \n", i, MEM[10 + i]);
-        printf("c[%d] = %d \n", i, MEM[20 + i]);
     }
+    printf("\n");
+    for (int i = 0; i < 10; i++)
+    {
+        printf("b[%d] = %d \n", i, MEM[i+10]);
+    }
+    printf("\n");
+    for (int i = 0; i < 10; i++)
+    {
+        printf("c[%d] = %d \n", i, MEM[i+20]);
+    }
+    printf("\n");
+
+    printf("PC = %d\n", PC);
+    printf("Cycles = %d\n", cycles);
+    printf("Instructins = %d\n", instructionCount);
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 // Main Functionalities
 
+void execute(int opcode, int operand1, int operand2, int operand3, int targetAddress){
+    switch(opcode){
+        case HALT: finished = 1;
+                   cycles ++;
+                break;
+        case ADD: RF[operand1] = RF[operand2] + RF[operand3];
+                  cycles ++;
+                break;
+        case ADDI: RF[operand1] = RF[operand2] + operand3;
+                   cycles ++;
+                break;
+        case SUB: RF[operand1] = RF[operand2] - RF[operand3];
+                  cycles ++;
+                break;
+        case SUBI: RF[operand1] = RF[operand2] - operand3;
+                  cycles ++;
+                break;
+        case MUL: RF[operand1] = RF[operand2] * RF[operand3];
+                  cycles ++;
+                break;
+        case MULI: RF[operand1] = RF[operand2] * operand3;
+                  cycles ++;
+                break;
+        case DIV: RF[operand1] = RF[operand2] / RF[operand3];
+                  cycles ++;
+                break;
+        case DIVI: RF[operand1] = RF[operand2] / operand3;
+                  cycles ++;
+                break;
+        case LD: RF[operand1] = MEM[targetAddress];
+                break;
+        case LDC: RF[operand1] = MEM[targetAddress];
+                break;
+        case STR: MEM[targetAddress] = RF[operand1];
+                break;
+        case STRC: MEM[targetAddress] = RF[operand1];
+                break;
+        case CMP: if(RF[operand2] > RF[operand3]) RF[operand1] = 1;
+                  else if(RF[operand2] == RF[operand3]) RF[operand1] = 0;
+                  else if(RF[operand2] < RF[operand3]) RF[operand1] = -1;
+                break;
+        case JMP: PC += operand1;
+                break;
+        case BR: PC = operand1;
+                break;
+        case BEQ: if(RF[operand1] == RF[operand2]) PC = operand3;
+                break;
+        case BLT: if(RF[operand1] < RF[operand2]) PC = operand3;
+                break;
+    }
+}
+
+void decode(struct instruction currentInstruction){
+    cycles++;
+    int opcode = currentInstruction.opCode;
+    int operand1 = currentInstruction.operand1;
+    int operand2 = currentInstruction.operand2;
+    int operand3 = currentInstruction.operand3;
+    int targetAddress = 0;
+
+    //calculate target address incase of load or store
+    switch(opcode){
+        case LD: targetAddress = RF[operand2] + operand3;
+                break;
+        case LDC: targetAddress = operand2;
+                break;
+        case STR: targetAddress = RF[operand2] + operand3;
+                break;
+        case STRC: targetAddress = operand2;
+                break;
+    }
+    execute(opcode, operand1, operand2, operand3, targetAddress);
+}
 
 void fetch(){
-
-}
-
-void decode(){
-
-}
-
-void execute(){
-
+    struct instruction currentInstruction = INSTR[PC];
+    instructionCount ++;
+    cycles ++;
+    PC ++;
+    decode(currentInstruction);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
@@ -216,13 +299,9 @@ int main(int argc, char const *argv[])
 
     initialize();
     loadProgram(argv[1]);
-    printSysInfo();
-    /*while(finished == 0){
+    while(finished == 0){
         fetch();
-        decode():
-        execute();
-        instructions++;
-        cycles += 3;
-    }*/
+    }
+    printSysInfo();
     return 0;
 }

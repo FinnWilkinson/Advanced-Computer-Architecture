@@ -6,6 +6,10 @@
 //Initialise array c = {87, 5, 9, 2, 41, 23, 54, 874, 2, 3}
 //a = {91, 12, 11, 90, 45, 30, 56, 975, 69, 324}
 //
+//a stored from MEM[0] to MEM[9]
+//b stored from MEM[10] to MEM[19]
+//c stored from MEM[20] to MEM[29]
+//
 //Initialise b
 ADDI r1, r0, 4
 STRC r1, 10

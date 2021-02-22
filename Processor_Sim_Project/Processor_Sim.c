@@ -16,6 +16,7 @@ struct instruction
     int operand1;
     int operand2;
     int operand3;
+    int instructionNumber;
 };
 
 int RF[32];         //r0 is zero register, val is always 0
@@ -36,6 +37,7 @@ void initialize(){
         INSTR[i].operand1 = 0;
         INSTR[i].operand2 = 0;
         INSTR[i].operand3 = 0;
+        INSTR[i].instructionNumber = 0;
     }
     for (int i = 32; i < 512; i++)
     {
@@ -44,6 +46,7 @@ void initialize(){
         INSTR[i].operand1 = 0;
         INSTR[i].operand2 = 0;
         INSTR[i].operand3 = 0;
+        INSTR[i].instructionNumber = 0;
     }
     for (int i = 512; i < 1024; i++)
     {
@@ -205,7 +208,35 @@ void printSysInfo(){
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 // Main Functionalities
 
-void execute(int opcode, int operand1, int operand2, int operand3, int targetAddress){
+struct instruction fetch(struct instruction nextInstruction){
+    nextInstruction = INSTR[PC];
+    nextInstruction.instructionNumber = instructionCount;
+    instructionCount ++;
+    cycles ++;
+    PC ++;
+    return nextInstruction;
+}
+
+int decode(struct instruction currentInstruction, int targetAddress){
+    //calculate target address incase of load or store
+    switch(currentInstruction.opCode){
+        case LD: targetAddress = RF[currentInstruction.operand2] + currentInstruction.operand3;
+                break;
+        case LDC: targetAddress = currentInstruction.operand2;
+                break;
+        case STR: targetAddress = RF[currentInstruction.operand2] + currentInstruction.operand3;
+                break;
+        case STRC: targetAddress = currentInstruction.operand2;
+                break;
+        defualt: targetAddress = 0;
+                break;
+    }
+    cycles++;
+    return targetAddress;
+}
+
+int execute(int opcode, int operand1, int operand2, int operand3, int targetAddress){
+    int error = 0;
     switch(opcode){
         case HALT: finished = 1;
                    cycles ++;
@@ -254,37 +285,11 @@ void execute(int opcode, int operand1, int operand2, int operand3, int targetAdd
                 break;
         case BLT: if(RF[operand1] < RF[operand2]) PC = operand3;
                 break;
-    }
-}
-
-void decode(struct instruction currentInstruction){
-    cycles++;
-    int opcode = currentInstruction.opCode;
-    int operand1 = currentInstruction.operand1;
-    int operand2 = currentInstruction.operand2;
-    int operand3 = currentInstruction.operand3;
-    int targetAddress = 0;
-
-    //calculate target address incase of load or store
-    switch(opcode){
-        case LD: targetAddress = RF[operand2] + operand3;
-                break;
-        case LDC: targetAddress = operand2;
-                break;
-        case STR: targetAddress = RF[operand2] + operand3;
-                break;
-        case STRC: targetAddress = operand2;
+        defualt: printf("ERROR - Opcode '%d' not recognised. Exiting...\n", opcode);
+                 error = -1;
                 break;
     }
-    execute(opcode, operand1, operand2, operand3, targetAddress);
-}
-
-void fetch(){
-    struct instruction currentInstruction = INSTR[PC];
-    instructionCount ++;
-    cycles ++;
-    PC ++;
-    decode(currentInstruction);
+    return error;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
@@ -292,16 +297,29 @@ void fetch(){
 
 int main(int argc, char const *argv[])
 {
+    //make sure program executed correctly
     if(argc == 1){
         printUsageInfo();
         return 0;
     }
 
+    //initialise memory, RF etc to 0
     initialize();
+    //load the selected program
     loadProgram(argv[1]);
+    //initialise needed variables
+    int error;
+    struct instruction nextInstruction;
+    int targetAddress = 0;
+
+    //main compute cycle
     while(finished == 0){
-        fetch();
+        nextInstruction = fetch(nextInstruction);
+        targetAddress = decode(nextInstruction, targetAddress);
+        error = execute(nextInstruction.opCode, nextInstruction.operand1, nextInstruction.operand2, nextInstruction.operand3, targetAddress);
+        if(error != 0) exit(1);
     }
+    //print system info
     printSysInfo();
     return 0;
 }

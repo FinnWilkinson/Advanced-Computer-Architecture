@@ -54,7 +54,7 @@ ADDI r1, r0, 3
 STRC r1, 29
 //Initialise i and endOfLoop check
 ADD r1, r0, r0
-ADDI r2, r0, 10 
+ADDI r2, r0, 10
 //startLoop
 LD r3, r1, 10
 LD r4, r1, 20

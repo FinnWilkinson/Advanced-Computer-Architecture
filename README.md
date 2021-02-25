@@ -1,6 +1,8 @@
 # Advanced Computer Architecture
  
- This repository contains my final year coursework project to make a emulation of a processor. I have written all the code in C.
+ This repository contains my final year coursework project to make a emulation of a processor. I have written the simulator in Python.
+
+ To compile and run the simulator: `python Simulator_main.py "../Assembly Programs/<CHOSEN_PROGRAM>.txt"`
 
  `Processor_Sim` contains the code for a simple scalar processor, which can read in instruction files (`.txt` format) and produce an output.
  The instructions set is as follows (also found in `Instructions.txt`):

@@ -1,6 +1,6 @@
 from Instruction import Instruction
 
-def executeInstruction(opcode, operand1, operand2, operand3, targetAddress, RF, MEM, PC, cycles, finished) :
+def executeInstruction(opcode, operand1, operand2, operand3, targetAddress, RF, MEM, PC, cycles, instructionExecuteCount, finished) :
     error = 0
     # HALT
     if opcode == 0:                                                     
@@ -68,4 +68,6 @@ def executeInstruction(opcode, operand1, operand2, operand3, targetAddress, RF, 
         print("ERROR - Opcode '{}' not recognised. Exiting..." .format(opcode))
         error = -1
 
-    return error, PC, cycles, finished
+    cycles += 1
+    instructionExecuteCount += 1
+    return error, PC, cycles, instructionExecuteCount, finished

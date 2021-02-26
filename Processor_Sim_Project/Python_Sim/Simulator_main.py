@@ -1,4 +1,3 @@
-import numpy as np
 from Instruction import Instruction
 from Print import *
 from Load_Assembly import *
@@ -9,7 +8,8 @@ from Execute import *
 # Global values
 finished = False
 cycles = 0
-instructionCount = 0
+instructionFetchCount = 0
+instructionExecuteCount = 0
 PC = 0
 
 RF = [0] * 32           # Register file. RF[0] or r0 is always = 0
@@ -32,16 +32,14 @@ if __name__=="__main__" :
 
     # Effective Clock
     while not finished :
-        nextInstruction, instructionCount, cycles, PC = fetchNext(INSTR, instructionCount, cycles, PC)
-        targetAddress = decodeInstruction(RF, cycles, nextInstruction)
-        error, PC, cycles, finished = executeInstruction(nextInstruction.opCode, nextInstruction.operand1, nextInstruction.operand2, nextInstruction.operand3, targetAddress, RF, MEM, PC, cycles, finished)
+        # Print initial system information
+        printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount)
+
+        nextInstruction, instructionFetchCount, cycles, PC = fetchNext(INSTR, instructionFetchCount, cycles, PC)
+        targetAddress, cycles = decodeInstruction(RF, cycles, nextInstruction)
+        error, PC, cycles, instructionExecuteCount, finished = executeInstruction(nextInstruction.opCode, nextInstruction.operand1, nextInstruction.operand2, nextInstruction.operand3, targetAddress, RF, MEM, PC, cycles, instructionExecuteCount, finished)
         if error != 0 :
             sys.exit(1)
-        # if(PC > 98):
-        #     print(RF)
-        #     print(MEM[:70])
-        #     print("PC = {}" .format(PC))
-        #     input("Press Enter to continue...")
     
     # Print final system information
-    printSysInfo(RF, MEM, INSTR, PC, cycles, instructionCount)
+    printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount)

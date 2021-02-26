@@ -17,5 +17,5 @@ def decodeInstruction(RF, cycles, currentInstruction) :
         targetAddress = currentInstruction.operand2
 
     cycles += 1
-    return targetAddress
+    return targetAddress, cycles
     

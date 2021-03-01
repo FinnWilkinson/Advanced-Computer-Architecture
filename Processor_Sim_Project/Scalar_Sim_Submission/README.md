@@ -5,25 +5,25 @@
  To compile and run the simulator: `python Simulator_main.py "../Assembly Programs/<CHOSEN_PROGRAM>.txt"`. 
 
 
+ Available Assembly test programs :
+  - `Quick_Sort.txt`
+  - `Vector_Addition.txt`
+  
+
  The external Dependancies are as follows :
   - `import os`
   - `import sys`
   - `import numpy as np`
 
 
- Available Assembly test programs :
-  - `Quick_Sort.txt`
-  - `Vector_Addition.txt`
-
-
  `Processor_Sim` contains the code for a simple scalar processor, which can read in instruction files (`.txt` format) and produce an output.
  The instructions set is as follows (also found in `Instructions.txt`):
- | Instruction       | Description                                                                                                                                 |
- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------|
- | `ADD rd, ra, rb`  |  RF[rd] = RF[ra] + RF[rb]                                                                                                                   |
- | `ADDI rd, ra, x`  |  RF[rd] = RF[ra] + x                                                                                    |
- | `SUB rd, ra, rb`  |  RF[rd] = RF[ra] - RF[rb]                                                                                                                   |
- | `SUBI rd, ra, x`  |  RF[rd] = RF[ra] - x                                                                                    |
+ | Instruction       | Description                                                                                                                                 
+ | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------
+ | `ADD rd, ra, rb`  |  RF[rd] = RF[ra] + RF[rb]                                                                                                                   
+ | `ADDI rd, ra, x`  |  RF[rd] = RF[ra] + x                                                                                    
+ | `SUB rd, ra, rb`  |  RF[rd] = RF[ra] - RF[rb]                                                                                                                   
+ | `SUBI rd, ra, x`  |  RF[rd] = RF[ra] - x                                                                                    
  | `MUL rd, ra, rb`  |  RF[rd] = RF[ra] * RF[rb]                                                                                            
  | `MULI rd, ra, x`  |  RF[rd] = RF[ra] * x                                                           
  | `DIV rd, ra, rb`  |  RF[rd] = RF[ra] / RF[rb]                                                      

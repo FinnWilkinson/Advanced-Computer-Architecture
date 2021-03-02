@@ -3,8 +3,9 @@ import sys
 import numpy as np
 
 def printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount) :
-    np.set_printoptions(threshold=sys.maxsize)
+    np.set_printoptions(threshold=sys.maxsize, linewidth=300)
     tempMEM = np.array(MEM)
+    tempMEM = np.reshape(tempMEM, (-1, 32))
     os.system('cls||clear')
 
     print("│ PC = {} │ Cycles = {} │ Instructions Fetched = {} │ Instructions Executed = {} |" .format(PC, cycles, instructionFetchCount, instructionExecuteCount))
@@ -19,9 +20,6 @@ def printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionE
     print("Main Memory :")
     print("────────────────")
     print(tempMEM)
-    
-
-
 
     print()
     input("Press Enter key to continue ...")
@@ -31,6 +29,7 @@ def printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionE
 def printUsageInfo() :
     os.system('cls||clear')
     print("To execute an assembly program, please include the name of the corresponding file.")
+    print()
     print("I.e.        python Simulator_main.py Vector_Addition.txt           ")
     print()
     input("Press Enter key to continue ...")

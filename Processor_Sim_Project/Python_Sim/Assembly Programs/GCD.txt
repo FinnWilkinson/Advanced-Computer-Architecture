@@ -1,0 +1,22 @@
+// GCD 18774 8046 = 2682
+//MEM[0] = 18774
+//MEM[1] = 8046
+//MEM[3] = answer
+//MEM[5] onwards = stack etc
+
+//x = 18774	y = 8046
+//int gcd(int x, int y)
+//{
+//   if (x == 0)
+//       return y;
+//   return gcd(y%x, x);
+//}
+
+//Save x and y to memory
+ADDC r1, r0, 18774
+ADDC r2, r0, 8046
+STRC r1 0
+STRC r2 1
+
+GCD:
+BEQ r0, r1 

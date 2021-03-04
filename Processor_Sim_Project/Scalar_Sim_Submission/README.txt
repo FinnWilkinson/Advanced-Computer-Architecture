@@ -12,6 +12,7 @@
  Available Assembly test programs :
   - `Quick_Sort.txt`
   - `Vector_Addition.txt`
+  - `Factorial.txt`
   
 
  The external Dependancies are as follows :
@@ -56,10 +57,10 @@ Noting that:
  ``` c
  struct instruction
  {
-     int opCode;
-     int operand1;
-     int operand2;
-     int operand3;
+     string opCode;
+     string operand1;
+     string operand2;
+     string operand3;
  };
  ```
  Once instructions are read in, they are saved to a seperate instruction memory array, which in the source code is defined as `struct instruction INSTR[512];`.

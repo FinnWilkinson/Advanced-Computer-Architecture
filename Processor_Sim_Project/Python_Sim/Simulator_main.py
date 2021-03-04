@@ -32,8 +32,9 @@ if __name__=="__main__" :
 
     # Effective Clock
     while not finished :
-        # Print initial system information
-        printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount)
+        if(len(sys.argv) > 2 and sys.argv[2] == "-verbose") :
+            # Print initial system information at users discretion
+            printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount)
 
         nextInstruction, instructionFetchCount, cycles, PC = fetchNext(INSTR, instructionFetchCount, cycles, PC)
         targetAddress, cycles = decodeInstruction(RF, cycles, nextInstruction)

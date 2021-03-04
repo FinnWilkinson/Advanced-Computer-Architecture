@@ -2,8 +2,10 @@
  
  This repository contains my final year coursework project to make a emulation of a processor. I have written the simulator in Python.
 
- To compile and run the simulator: `python Simulator_main.py "../Assembly Programs/<CHOSEN_PROGRAM>.txt"`. 
+ To compile and run the simulator: `python Simulator_main.py "Assembly Programs/<CHOSEN_PROGRAM>.txt"` in the Python_Sim directory. 
 
+ To compile and run the simulator with status update after each instruction execution: `python Simulator_main.py "Assembly Programs/<CHOSEN_PROGRAM>.txt" -verbose` 
+ in the Python_Sim directory. 
 
  Available Assembly test programs :
   - `Quick_Sort.txt`
@@ -58,7 +60,10 @@ Noting that:
      int operand3;
  };
  ```
- Once instructions are read in, they are saved to a seperate instruction memory array, which in the source code is defined as `struct instruction INSTR[512];`.\
- All opcodes and operands are treated as 32-bit integers, rather than combining them into a single 32-bit operation. This decision was taken (in addition to it being in the coursework specification) to make the project simpler to code, and adding this bit manipulation does not add anything to the simulator in terms of what it can do (i.e. its functionality does not change, only its complexity to understand and to code). 
+ Once instructions are read in, they are saved to a seperate instruction memory array, which in the source code is defined as `struct instruction INSTR[512];`.
+ All opcodes and operands are treated as 32-bit integers, rather than combining them into a single 32-bit operation. 
+ This decision was taken (in addition to it being in the coursework specification) to make the project simpler to code, 
+ and adding this bit manipulation does not add anything to the simulator in terms of what it can do 
+ (i.e. its functionality does not change, only its complexity to understand and to code). 
 
  

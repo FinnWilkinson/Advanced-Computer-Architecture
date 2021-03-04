@@ -2,7 +2,9 @@
  
  This repository contains my final year coursework project to make a emulation of a processor. I have written the simulator in Python.
 
- To compile and run the simulator: `python Simulator_main.py "../Assembly Programs/<CHOSEN_PROGRAM>.txt"`. 
+ To compile and run the simulator: `python Simulator_main.py "Assembly Programs/<CHOSEN_PROGRAM>.txt"` in the Python_Sim directory. 
+
+ To compile and run the simulator with status update after each instruction execution: `python Simulator_main.py "Assembly Programs/<CHOSEN_PROGRAM>.txt" -verbose` in the Python_Sim directory.
 
 
  The external Dependancies are as follows :

@@ -1,68 +1,69 @@
 from Instruction import Instruction
+from Register_File import RegFile
 
 def executeInstruction(opcode, operand1, operand2, operand3, targetAddress, RF, MEM, PC, cycles, instructionExecuteCount, finished) :
     error = 0
     # HALT
-    if opcode == 0:                                                     
+    if opcode == "HALT":                                                     
         finished = True
     # ADD
-    elif opcode == 1: 
-        RF[operand1] = RF[operand2] + RF[operand3]
+    elif opcode == "ADD": 
+        RF.Set(operand1, RF.Get(operand2) + RF.Get(operand3))
     # ADDI
-    elif opcode == 2: 
-        RF[operand1] = RF[operand2] + operand3
+    elif opcode == "ADDI": 
+        RF.Set(operand1, RF.Get(operand2) + int(operand3))
     # SUB
-    elif opcode == 3: 
-        RF[operand1] = RF[operand2] - RF[operand3]
+    elif opcode == "SUB": 
+        RF.Set(operand1, RF.Get(operand2) - RF.Get(operand3))
     # SUBI
-    elif opcode == 4: 
-        RF[operand1] = RF[operand2] - operand3
+    elif opcode == "SUBI": 
+        RF.Set(operand1, RF.Get(operand2) - int(operand3))
     # MUL
-    elif opcode == 5: 
-        RF[operand1] = RF[operand2] * RF[operand3]
+    elif opcode == "MUL": 
+        RF.Set(operand1, RF.Get(operand2) * RF.Get(operand3))
     # MULI
-    elif opcode == 6: 
-        RF[operand1] = RF[operand2] * operand3
+    elif opcode == "MULI": 
+        RF.Set(operand1, RF.Get(operand2) * int(operand3))
     # DIV
-    elif opcode == 7: 
-        RF[operand1] = int(RF[operand2] / RF[operand3])
+    elif opcode == "DIV": 
+        RF.Set(operand1, int(RF.Get(operand2) / RF.Get(operand3)))
     # DIVI
-    elif opcode == 8: 
-        RF[operand1] = int(RF[operand2] / operand3)
+    elif opcode == "DIVI": 
+        RF.Set(operand1, int(RF.Get(operand2) / int(operand3)))
     # LD
-    elif opcode == 9: 
-        RF[operand1] = MEM[targetAddress]
+    elif opcode == "LD": 
+        RF.Set(operand1, MEM[targetAddress])
     # LDC
-    elif opcode == 10: 
-        RF[operand1] = MEM[targetAddress]
+    elif opcode == "LDC": 
+        RF.Set(operand1, MEM[targetAddress])
     # STR
-    elif opcode == 11: 
-        MEM[targetAddress] = RF[operand1]
+    elif opcode == "STR": 
+        MEM[targetAddress] = RF.Get(operand1)
     # STRC
-    elif opcode == 12:
-        MEM[targetAddress] = RF[operand1]
+    elif opcode == "STRC":
+        MEM[targetAddress] = RF.Get(operand1)
     # CMP
-    elif opcode == 13: 
-        if(RF[operand2] > RF[operand3]) :
-            RF[operand1] = 1
-        elif(RF[operand2] == RF[operand3]) :
-            RF[operand1] = 0
-        elif(RF[operand2] < RF[operand3]) :
-            RF[operand1] = -1
+    elif opcode == "CMP": 
+        if(RF.Get(operand2) > RF.Get(operand3)) :
+            RF.Set(operand1, 1)
+        elif(RF.Get(operand2) == RF.Get(operand3)) :
+            RF.Set(operand1, 0)
+        elif(RF.Get(operand2) < RF.Get(operand3)) :
+            RF.Set(operand1, -1)
     # JMP
-    elif opcode == 14: 
-        PC = RF[operand1]
+    elif opcode == "JMP": 
+        PC = RF.Get(operand1)
     # BR
-    elif opcode == 15: 
-        PC = operand1
+    elif opcode == "BR": 
+        PC = int(operand1)
     # BEQ
-    elif opcode == 16: 
-        if(RF[operand1] == RF[operand2]) :
-            PC = operand3
+    elif opcode == "BEQ": 
+        if(RF.Get(operand1) == RF.Get(operand2)) :
+            PC = int(operand3)
     # BLT
-    elif opcode == 17: 
-        if(RF[operand1] < RF[operand2]) :
-            PC = operand3
+    elif opcode == "BLT": 
+        if(RF.Get(operand1) < RF.Get(operand2)) :
+            PC = int(operand3)
     # Opcode not recognised
     else: 
         print("ERROR - Opcode '{}' not recognised. Exiting..." .format(opcode))

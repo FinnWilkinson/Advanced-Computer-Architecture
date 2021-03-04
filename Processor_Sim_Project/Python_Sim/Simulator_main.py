@@ -1,4 +1,5 @@
 from Instruction import Instruction
+from Register_File import RegFile
 from Print import *
 from Load_Assembly import *
 from Fetch import *
@@ -12,8 +13,8 @@ instructionFetchCount = 0
 instructionExecuteCount = 0
 PC = 0
 
-RF = [0] * 32           # Register file. RF[0] or r0 is always = 0
-MEM = [0] * 1024        # Data memory
+RF = RegFile(32)                          # Register file. RF[0] or r0 is always = 0
+MEM = [0] * 1024                          # Data memory
 INSTR = [Instruction(0,0,0,0,0)] * 512    # Instruction memory
 
 if __name__=="__main__" :

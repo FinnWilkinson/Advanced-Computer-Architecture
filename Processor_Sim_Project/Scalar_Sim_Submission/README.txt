@@ -7,6 +7,8 @@
  To compile and run the simulator with status update after each instruction execution: `python Simulator_main.py "Assembly Programs/<CHOSEN_PROGRAM>.txt" -verbose` 
  in the Python_Sim directory. 
 
+
+ All Assembly programs contain comments at the top to help explain what the script will do.
  Available Assembly test programs :
   - `Quick_Sort.txt`
   - `Vector_Addition.txt`
@@ -35,7 +37,7 @@
  | `STR ra, rd, x`   |  MEM[ RF[rd] + x ] = RF[ra]                                                    
  | `STRC ra, x`      |  MEM[ x ] = RF[ra]                                                             
  | `CMP rd, ra, rb`  |  if RF[ra] > RF[rb] then RF[rd] = 1; if RF[ra] = RF[rb] then RF[rd] = 0; if RF[ra] < RF[rb] then RF[rd] = -1;
- | `JMP x`           |  PC += x                                   
+ | `JMP ra`           |  PC = RF[ra]                                   
  | `BR x`            |  PC = x                                    
  | `BEQ ra, rb, x`   |  if RF[ra] = RF[rb] then PC = x;           
  | `BLT ra, rb, x`   |  if RF[ra] < RF[rb] then PC = x;           

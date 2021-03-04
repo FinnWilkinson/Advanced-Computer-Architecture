@@ -1,6 +1,7 @@
 import os
 import sys
 import numpy as np
+from Register_File import RegFile
 
 def printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount) :
     np.set_printoptions(threshold=sys.maxsize, linewidth=300)
@@ -12,10 +13,10 @@ def printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionE
     print()
     print("Register File :")
     print("────────────────")
-    print("│ r0 = {} │ r1 = {} │ r2 = {} │ r3 = {} │ r4 = {} │ r5 = {} │ r6 ={} │ r7 = {} │" .format(RF[0], RF[1], RF[2], RF[3], RF[4], RF[5], RF[6], RF[7]))
-    print("│ r8 = {} │ r9 = {} │ r10 = {} │ r11 = {} │ r12 = {} │ r13 = {} │ r14 ={} │ r15 = {} │" .format(RF[8], RF[9], RF[10], RF[11], RF[12], RF[13], RF[14], RF[15]))
-    print("│ r16 = {} │ r17 = {} │ r18 = {} │ r19 = {} │ r20 = {} │ r21 = {} │ r22 ={} │ r23 = {} │" .format(RF[16], RF[17], RF[18], RF[19], RF[20], RF[21], RF[22], RF[23]))
-    print("│ r24 = {} │ r25 = {} │ r26 = {} │ r27 = {} │ r28 = {} │ r29 = {} │ r30 ={} │ r31 = {} │" .format(RF[24], RF[25], RF[26], RF[27], RF[28], RF[29], RF[30], RF[31]))
+    print("│ r0 = {} │ r1 = {} │ r2 = {} │ r3 = {} │ r4 = {} │ r5 = {} │ r6 ={} │ r7 = {} │" .format(RF.Get("r0"), RF.Get("r1"), RF.Get("r2"), RF.Get("r3"), RF.Get("r4"), RF.Get("r5"), RF.Get("r6"), RF.Get("r7")))
+    print("│ r8 = {} │ r9 = {} │ r10 = {} │ r11 = {} │ r12 = {} │ r13 = {} │ r14 ={} │ r15 = {} │" .format(RF.Get("r8"), RF.Get("r9"), RF.Get("r10"), RF.Get("r11"), RF.Get("r12"), RF.Get("r13"), RF.Get("r14"), RF.Get("r15")))
+    print("│ r16 = {} │ r17 = {} │ r18 = {} │ r19 = {} │ r20 = {} │ r21 = {} │ r22 ={} │ r23 = {} │" .format(RF.Get("r16"), RF.Get("r17"), RF.Get("r18"), RF.Get("r19"), RF.Get("r20"), RF.Get("r21"), RF.Get("r22"), RF.Get("r23")))
+    print("│ r24 = {} │ r25 = {} │ r26 = {} │ r27 = {} │ r28 = {} │ r29 = {} │ r30 ={} │ r31 = {} │" .format(RF.Get("r24"), RF.Get("r25"), RF.Get("r26"), RF.Get("r27"), RF.Get("r28"), RF.Get("r29"), RF.Get("r30"), RF.Get("r31")))
     print()
     print("Main Memory :")
     print("────────────────")

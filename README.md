@@ -35,7 +35,7 @@
  | `STR ra, rd, x`   |  MEM[ RF[rd] + x ] = RF[ra]                                                    
  | `STRC ra, x`      |  MEM[ x ] = RF[ra]                                                             
  | `CMP rd, ra, rb`  |  if RF[ra] > RF[rb] then RF[rd] = 1; if RF[ra] = RF[rb] then RF[rd] = 0; if RF[ra] < RF[rb] then RF[rd] = -1;
- | `JMP x`           |  PC += x                                   
+ | `JMP ra`          |  PC = RF[ra]                                   
  | `BR x`            |  PC = x                                    
  | `BEQ ra, rb, x`   |  if RF[ra] = RF[rb] then PC = x;           
  | `BLT ra, rb, x`   |  if RF[ra] < RF[rb] then PC = x;           

@@ -1,4 +1,5 @@
 from Instruction import Instruction
+from Register_File import RegFile
 
 # Instructions:
 # HALT = 0, ADD = 1, ADDI = 2, SUB = 3, SUBI = 4, MUL = 5, MULI = 6, DIV = 7, DIVI = 8, LD = 9,
@@ -7,14 +8,14 @@ from Instruction import Instruction
 def decodeInstruction(RF, cycles, currentInstruction) :
     targetAddress = 0 
     #calculate target address for load or store
-    if currentInstruction.opCode == 9 :
-        targetAddress = RF[currentInstruction.operand2] + currentInstruction.operand3
-    elif currentInstruction.opCode == 10 :
-        targetAddress = currentInstruction.operand2
-    elif currentInstruction.opCode == 11 :
-        targetAddress = RF[currentInstruction.operand2] + currentInstruction.operand3
-    elif currentInstruction.opCode == 12 :
-        targetAddress = currentInstruction.operand2
+    if currentInstruction.opCode == "LD" :
+        targetAddress = RF.Get(currentInstruction.operand2) + int(currentInstruction.operand3)
+    elif currentInstruction.opCode == "LDC" :
+        targetAddress = int(currentInstruction.operand2)
+    elif currentInstruction.opCode == "STR" :
+        targetAddress = RF.Get(currentInstruction.operand2) + int(currentInstruction.operand3)
+    elif currentInstruction.opCode == "STRC" :
+        targetAddress = int(currentInstruction.operand2)
 
     cycles += 1
     return targetAddress, cycles

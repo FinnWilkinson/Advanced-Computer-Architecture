@@ -12,6 +12,7 @@ cycles = 0
 instructionFetchCount = 0
 instructionExecuteCount = 0
 PC = 0
+branchCount = 0
 
 RF = RegFile(32)                          # Register file. RF[0] or r0 is always = 0
 MEM = [0] * 1024                          # Data memory
@@ -39,9 +40,9 @@ if __name__=="__main__" :
 
         nextInstruction, instructionFetchCount, cycles, PC = fetchNext(INSTR, instructionFetchCount, cycles, PC)
         targetAddress, cycles = decodeInstruction(RF, cycles, nextInstruction)
-        error, PC, cycles, instructionExecuteCount, finished = executeInstruction(nextInstruction.opCode, nextInstruction.operand1, nextInstruction.operand2, nextInstruction.operand3, targetAddress, RF, MEM, PC, cycles, instructionExecuteCount, finished)
+        error, PC, cycles, instructionExecuteCount, finished, branchCount = executeInstruction(nextInstruction.opCode, nextInstruction.operand1, nextInstruction.operand2, nextInstruction.operand3, targetAddress, RF, MEM, PC, cycles, instructionExecuteCount, finished, branchCount)
         if error != 0 :
             sys.exit(1)
     
     # Print final system information
-    printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount)
+    printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, branchCount)

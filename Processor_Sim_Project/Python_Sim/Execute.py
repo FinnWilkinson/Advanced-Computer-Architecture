@@ -1,7 +1,7 @@
 from Instruction import Instruction
 from Register_File import RegFile
 
-def executeInstruction(opcode, operand1, operand2, operand3, targetAddress, RF, MEM, PC, cycles, instructionExecuteCount, finished) :
+def executeInstruction(opcode, operand1, operand2, operand3, targetAddress, RF, MEM, PC, cycles, instructionExecuteCount, finished, branchCount) :
     error = 0
     # HALT
     if opcode == "HALT":                                                     
@@ -52,18 +52,22 @@ def executeInstruction(opcode, operand1, operand2, operand3, targetAddress, RF, 
             RF.Set(operand1, -1)
     # JMP
     elif opcode == "JMP": 
+        branchCount += 1
         PC = RF.Get(operand1)
     # BR
     elif opcode == "BR": 
+        branchCount += 1
         PC = int(operand1)
     # BEQ
     elif opcode == "BEQ": 
         if(RF.Get(operand1) == RF.Get(operand2)) :
             PC = int(operand3)
+            branchCount += 1
     # BLT
     elif opcode == "BLT": 
         if(RF.Get(operand1) < RF.Get(operand2)) :
             PC = int(operand3)
+            branchCount += 1
     # Opcode not recognised
     else: 
         print("ERROR - Opcode '{}' not recognised. Exiting..." .format(opcode))
@@ -71,4 +75,4 @@ def executeInstruction(opcode, operand1, operand2, operand3, targetAddress, RF, 
 
     cycles += 1
     instructionExecuteCount += 1
-    return error, PC, cycles, instructionExecuteCount, finished
+    return error, PC, cycles, instructionExecuteCount, finished, branchCount

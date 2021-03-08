@@ -66,4 +66,5 @@ ADD r5, r3, r4
 STR r5, r1, 0
 ADDI r1, r1, 1
 BLT r1, r2, loop
+
 HALT

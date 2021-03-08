@@ -3,13 +3,12 @@ import sys
 import numpy as np
 from Register_File import RegFile
 
-def printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount) :
+def printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, branchCount) :
     np.set_printoptions(threshold=sys.maxsize, linewidth=300)
-    tempMEM = np.array(MEM)
-    tempMEM = np.reshape(tempMEM, (-1, 32))
+    tempMEM = np.reshape(MEM, (-1, 32))
     os.system('cls||clear')
 
-    print("│ PC = {} │ Cycles = {} │ Instructions Fetched = {} │ Instructions Executed = {} |" .format(PC, cycles, instructionFetchCount, instructionExecuteCount))
+    print("│ PC = {} │ Cycles = {} │ Instructions Fetched = {} │ Instructions Executed = {} | Branches Taken = {}" .format(PC, cycles, instructionFetchCount, instructionExecuteCount, branchCount))
     print()
     print("Register File :")
     print("────────────────")
@@ -18,8 +17,8 @@ def printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionE
     print("│ r16 = {} │ r17 = {} │ r18 = {} │ r19 = {} │ r20 = {} │ r21 = {} │ r22 ={} │ r23 = {} │" .format(RF.Get("r16"), RF.Get("r17"), RF.Get("r18"), RF.Get("r19"), RF.Get("r20"), RF.Get("r21"), RF.Get("r22"), RF.Get("r23")))
     print("│ r24 = {} │ r25 = {} │ r26 = {} │ r27 = {} │ r28 = {} │ r29 = {} │ r30 ={} │ r31 = {} │" .format(RF.Get("r24"), RF.Get("r25"), RF.Get("r26"), RF.Get("r27"), RF.Get("r28"), RF.Get("r29"), RF.Get("r30"), RF.Get("r31")))
     print()
-    print("Main Memory :")
-    print("────────────────")
+    print("Main Memory - 1024 represented as 32x32 (Indecies 0 to 31 are top row):")
+    print("────────────────────────────────────────────────────────────────────────")
     print(tempMEM)
 
     print()

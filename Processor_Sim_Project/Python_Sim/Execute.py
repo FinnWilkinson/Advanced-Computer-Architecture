@@ -6,78 +6,80 @@ class Execution_Unit :
     def __init__(self) :
         return
 
-    def executeInstruction(self, opcode, operand1, operand2, operand3, targetAddress, RF, MEM, PC, cycles, instructionExecuteCount, finished, branchCount) :
+    def executeInstruction(self, DE_EX, RF, MEM, PC, finished, branchExecutedCount, branchTakenCount) :
         error = 0
         # HALT
-        if opcode == "HALT":                                                     
+        if DE_EX._instruction().opCode == "HALT":                                                     
             finished = True
         # ADD
-        elif opcode == "ADD": 
-            RF.Set(operand1, RF.Get(operand2) + RF.Get(operand3))
+        elif DE_EX._instruction().opCode == "ADD": 
+            RF.Set(DE_EX._instruction().operand1, RF.Get(DE_EX._instruction().operand2) + RF.Get(DE_EX._instruction().operand3))
         # ADDI
-        elif opcode == "ADDI": 
-            RF.Set(operand1, RF.Get(operand2) + int(operand3))
+        elif DE_EX._instruction().opCode == "ADDI": 
+            RF.Set(DE_EX._instruction().operand1, RF.Get(DE_EX._instruction().operand2) + int(DE_EX._instruction().operand3))
         # SUB
-        elif opcode == "SUB": 
-            RF.Set(operand1, RF.Get(operand2) - RF.Get(operand3))
+        elif DE_EX._instruction().opCode == "SUB": 
+            RF.Set(DE_EX._instruction().operand1, RF.Get(DE_EX._instruction().operand2) - RF.Get(DE_EX._instruction().operand3))
         # SUBI
-        elif opcode == "SUBI": 
-            RF.Set(operand1, RF.Get(operand2) - int(operand3))
+        elif DE_EX._instruction().opCode == "SUBI": 
+            RF.Set(DE_EX._instruction().operand1, RF.Get(DE_EX._instruction().operand2) - int(DE_EX._instruction().operand3))
         # MUL
-        elif opcode == "MUL": 
-            RF.Set(operand1, RF.Get(operand2) * RF.Get(operand3))
+        elif DE_EX._instruction().opCode == "MUL": 
+            RF.Set(DE_EX._instruction().operand1, RF.Get(DE_EX._instruction().operand2) * RF.Get(DE_EX._instruction().operand3))
         # MULI
-        elif opcode == "MULI": 
-            RF.Set(operand1, RF.Get(operand2) * int(operand3))
+        elif DE_EX._instruction().opCode == "MULI": 
+            RF.Set(DE_EX._instruction().operand1, RF.Get(DE_EX._instruction().operand2) * int(DE_EX._instruction().operand3))
         # DIV
-        elif opcode == "DIV": 
-            RF.Set(operand1, int(RF.Get(operand2) / RF.Get(operand3)))
+        elif DE_EX._instruction().opCode == "DIV": 
+            RF.Set(DE_EX._instruction().operand1, int(RF.Get(DE_EX._instruction().operand2) / RF.Get(DE_EX._instruction().operand3)))
         # DIVI
-        elif opcode == "DIVI": 
-            RF.Set(operand1, int(RF.Get(operand2) / int(operand3)))
+        elif DE_EX._instruction().opCode == "DIVI": 
+            RF.Set(DE_EX._instruction().operand1, int(RF.Get(DE_EX._instruction().operand2) / int(DE_EX._instruction().operand3)))
         # LD
-        elif opcode == "LD": 
-            RF.Set(operand1, MEM[targetAddress])
+        elif DE_EX._instruction().opCode == "LD": 
+            RF.Set(DE_EX._instruction().operand1, MEM[DE_EX._targetAddress()])
         # LDC
-        elif opcode == "LDC": 
-            RF.Set(operand1, MEM[targetAddress])
+        elif DE_EX._instruction().opCode == "LDC": 
+            RF.Set(DE_EX._instruction().operand1, MEM[DE_EX._targetAddress()])
         # STR
-        elif opcode == "STR": 
-            MEM[targetAddress] = RF.Get(operand1)
+        elif DE_EX._instruction().opCode == "STR": 
+            MEM[DE_EX._targetAddress()] = RF.Get(DE_EX._instruction().operand1)
         # STRC
-        elif opcode == "STRC":
-            MEM[targetAddress] = RF.Get(operand1)
+        elif DE_EX._instruction().opCode == "STRC":
+            MEM[DE_EX._targetAddress()] = RF.Get(DE_EX._instruction().operand1)
         # CMP
-        elif opcode == "CMP": 
-            if(RF.Get(operand2) > RF.Get(operand3)) :
-                RF.Set(operand1, 1)
-            elif(RF.Get(operand2) == RF.Get(operand3)) :
-                RF.Set(operand1, 0)
-            elif(RF.Get(operand2) < RF.Get(operand3)) :
-                RF.Set(operand1, -1)
+        elif DE_EX._instruction().opCode == "CMP": 
+            if(RF.Get(DE_EX._instruction().operand2) > RF.Get(DE_EX._instruction().operand3)) :
+                RF.Set(DE_EX._instruction().operand1, 1)
+            elif(RF.Get(DE_EX._instruction().operand2) == RF.Get(DE_EX._instruction().operand3)) :
+                RF.Set(DE_EX._instruction().operand1, 0)
+            elif(RF.Get(DE_EX._instruction().operand2) < RF.Get(DE_EX._instruction().operand3)) :
+                RF.Set(DE_EX._instruction().operand1, -1)
         # JMP
-        elif opcode == "JMP": 
-            branchCount += 1
-            PC = RF.Get(operand1)
+        elif DE_EX._instruction().opCode == "JMP": 
+            branchExecutedCount += 1
+            branchTakenCount += 1
+            PC = RF.Get(DE_EX._instruction().operand1)
         # BR
-        elif opcode == "BR": 
-            branchCount += 1
-            PC = int(operand1)
+        elif DE_EX._instruction().opCode == "BR": 
+            branchExecutedCount += 1
+            branchTakenCount += 1
+            PC = int(DE_EX._instruction().operand1)
         # BEQ
-        elif opcode == "BEQ": 
-            if(RF.Get(operand1) == RF.Get(operand2)) :
-                PC = int(operand3)
-                branchCount += 1
+        elif DE_EX._instruction().opCode == "BEQ": 
+            branchExecutedCount += 1
+            if(RF.Get(DE_EX._instruction().operand1) == RF.Get(DE_EX._instruction().operand2)) :
+                PC = int(DE_EX._instruction().operand3)
+                branchTakenCount += 1
         # BLT
-        elif opcode == "BLT": 
-            if(RF.Get(operand1) < RF.Get(operand2)) :
-                PC = int(operand3)
-                branchCount += 1
+        elif DE_EX._instruction().opCode == "BLT": 
+            branchExecutedCount += 1
+            if(RF.Get(DE_EX._instruction().operand1) < RF.Get(DE_EX._instruction().operand2)) :
+                PC = int(DE_EX._instruction().operand3)
+                branchTakenCount += 1
         # Opcode not recognised
         else: 
-            print("ERROR - Opcode '{}' not recognised. Exiting..." .format(opcode))
+            print("ERROR - Opcode '{}' not recognised. Exiting..." .format(DE_EX._instruction().opCode))
             error = -1
 
-        cycles += 1
-        instructionExecuteCount += 1
-        return error, PC, cycles, instructionExecuteCount, finished, branchCount
+        return error, PC, finished, branchExecutedCount, branchTakenCount

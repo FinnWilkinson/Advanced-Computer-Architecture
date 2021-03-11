@@ -8,20 +8,33 @@ from Register_File import RegFile
 class Decode_Unit :
 
     def __init__(self) :
-            return
+        self.branchInstructions = ["JMP", "BR", "BEQ", "BLT"]
+        self.loadStoreInstructions = ["LD", "LDC", "STR", "STRC"]
 
-    def decodeInstruction(self, RF, cycles, currentInstruction) :
-        targetAddress = 0 
-        #calculate target address for load or store
-        if currentInstruction.opCode == "LD" :
-            targetAddress = RF.Get(currentInstruction.operand2) + int(currentInstruction.operand3)
-        elif currentInstruction.opCode == "LDC" :
-            targetAddress = int(currentInstruction.operand2)
-        elif currentInstruction.opCode == "STR" :
-            targetAddress = RF.Get(currentInstruction.operand2) + int(currentInstruction.operand3)
-        elif currentInstruction.opCode == "STRC" :
-            targetAddress = int(currentInstruction.operand2)
 
-        cycles += 1
-        return targetAddress, cycles
+    def decodeInstruction(self, IF_DE, DE_EX, RF) :
+        # Get instruction Type = 0,1,2 (branch, load/store, arithmetic)
+        # Calc. target address
+
+
+        nextInstruction = IF_DE._instruction()
+        if nextInstruction.opCode in self.branchInstructions :
+            DE_EX._type(0)
+        elif nextInstruction.opCode in self.loadStoreInstructions :
+            DE_EX._type(1)
+        else :
+            DE_EX._type(2)
+
+        if DE_EX._type() == 1 :
+            targetAddress = 0 
+            if nextInstruction.opCode == "LD" or nextInstruction.opCode == "STR" :
+                targetAddress = RF.Get(nextInstruction.operand2) + int(nextInstruction.operand3)
+            elif nextInstruction.opCode == "LDC" or nextInstruction.opCode == "STRC" :
+                targetAddress = int(nextInstruction.operand2)
+            
+            DE_EX._targetAddress(targetAddress)
+
+        DE_EX._instruction(IF_DE._instruction())
+
+        return IF_DE, DE_EX
         

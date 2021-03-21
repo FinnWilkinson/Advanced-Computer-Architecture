@@ -15,8 +15,8 @@
 //Save x and y to memory
 ADDC r1, r0, 18774
 ADDC r2, r0, 8046
-STRC r1 0
-STRC r2 1
+STRC r1 r0, 0
+STRC r2 r1, 1
 
 GCD:
 BEQ r0, r1 

@@ -5,7 +5,7 @@
 
 //Store value to memory
 ADDI r1, r0, 12
-STRC r1, 0
+STRC r1, r0, 0
 
 //output = 1
 //For value = 1 to 12
@@ -15,7 +15,7 @@ STRC r1, 0
 //r1 = value, 	r2 = output, 	r3 = 12 (max loop val)
 ADDI r1, r0, 1
 ADDI r2, r0, 1
-LDC r3, 0
+LDC r3, r0, 0
 
 Loop:
 BLT r3, r1, End
@@ -24,5 +24,5 @@ ADDI r1, r1, 1
 BR Loop
 
 End:
-STRC r2, 2
+STRC r2, r0, 2
 HALT 

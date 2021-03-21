@@ -77,6 +77,12 @@ class Execution_Unit :
             if(RF.Get(DE_EX._instruction().operand1) < RF.Get(DE_EX._instruction().operand2)) :
                 PC = int(DE_EX._instruction().operand3)
                 branchTakenCount += 1
+        #LSL
+        elif DE_EX._instruction().opCode == "LSL":
+            RF.Set(DE_EX._instruction().operand1, int(RF.Get(DE_EX._instruction().operand2) << int(RF.Get(RF.Get(DE_EX._instruction().operand3)))))
+        #LSR
+        elif DE_EX._instruction().opCode == "LSR":
+            RF.Set(DE_EX._instruction().operand1, int(RF.Get(DE_EX._instruction().operand2) >> int(RF.Get(RF.Get(DE_EX._instruction().operand3)))))
         # Opcode not recognised
         else: 
             print("ERROR - Opcode '{}' not recognised. Exiting..." .format(DE_EX._instruction().opCode))

@@ -7,94 +7,94 @@
 ADD r2, r0, r0
 // Place array in memory
 ADDI r1, r0, 570
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 151
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 394
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 597
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 756
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 424
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 610
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 5
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 883
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 299
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 162
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 320
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 366
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 917
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 481
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 842
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 545
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 722
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 438
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 109
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 618
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 631
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 506
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 958
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 318
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 238
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 900
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 341
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 34
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 ADDI r1, r0, 261
-STR r1, r2, 0
+STR r1, r0, r2
 ADDI r2, r2, 1
 
 // Begin quick sort NEXT LINE BELOW IS PC = 91
@@ -108,18 +108,18 @@ ADD r4, r0, r2
 ADDI r31, r0, 40
 //Make first (last to access) stack entry HALT PC address
 ADDI r30, r0, End
-STR r30, r31, 0
+STR r30, r31, r0
 ADDI r31, r31, 1
 
 Quicksort:
 BLT r3, r4, Partition
 SUBI r31, r31, 1
-LD r30, r31, 0
+LD r30, r31, r0
 JMP r30
 
 //r6 = Pivot, r7 = i, r8 = j, r9 = high - 1
 Partition:
-LD r6, r4, 0
+LD r6, r4, r0
 SUBI r7, r3, 1
 
 //for (j = low; j <= high- 1; j++)
@@ -137,15 +137,15 @@ SUBI r9, r4, 1
 
 //r10 = array[j]
 LoopStart:
-LD r10, r8, 0
+LD r10, r8, r0
 BLT r10, r6, LoopCont
 BR LoopEnd
 
 LoopCont:
 ADDI r7, r7, 1
-LD r11, r7, 0
-STR r11, r8, 0
-STR r10, r7, 0
+LD r11, r7, r0
+STR r11, r8, r0
+STR r10, r7, r0
 
 LoopEnd:
 ADDI r8, r8, 1
@@ -153,23 +153,23 @@ BLT r8, r9, LoopStart
 BEQ r8, r9, LoopStart
 
 //last of partition function
-LD r11, r7, 1
-LD r12, r4, 0
-STR r11, r4, 0
-STR r12, r7, 1
+LDC r11, r7, 1
+LDC r12, r4, 0
+STRC r11, r4, 0
+STRC r12, r7, 1
 
 //Set partition index to i + 1        PC below =  121
 ADDI r5, r7, 1
 
 //save low, high, partition index to stack          PC below = 122
-STR r3, r31, 0
-STR r4, r31, 1
-STR r5, r31, 2
+STRC r3, r31, 0
+STRC r4, r31, 1
+STRC r5, r31, 2
 ADDI r31, r31, 3
 
 //save return address
 ADDI r30, r0, 131
-STR r30, r31, 0
+STR r30, r31, r0
 ADDI r31, r31, 1
 
 //set high to PI - 1
@@ -177,9 +177,9 @@ SUBI r4, r5, 1
 BR Quicksort
 
 //PC below = 131
-LD r5, r31, -1
-LD r4, r31, -2
-LD r3, r31, -3
+LDC r5, r31, -1
+LDC r4, r31, -2
+LDC r3, r31, -3
 SUBI r31, r31, 3
 
 //set low to PI + 1

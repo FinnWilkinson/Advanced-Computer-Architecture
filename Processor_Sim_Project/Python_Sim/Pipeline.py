@@ -20,6 +20,7 @@ class Pipeline:
     def advance(self, PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, finished, RF, MEM, INSTR, error) :
         # Advance back to front to ensure pipeline can progress
         
+        # EX
         if self.DE_EX._empty() is False :
             error, PC, finished, branchExecutedCount, branchTakenCount = self.EU.executeInstruction(self.DE_EX, RF, MEM, PC, finished, branchExecutedCount, branchTakenCount)
             if self.DE_EX._type() == 0 :
@@ -27,11 +28,13 @@ class Pipeline:
             self.DE_EX._empty(True)
             instructionExecuteCount += 1
 
+        # DE
         if self.IF_DE._empty() is False and self.DE_EX._empty() is True:
             self.IF_DE, self.DE_EX = self.decodeUnit.decodeInstruction(self.IF_DE, self.DE_EX, RF)
             self.IF_DE._empty(True)
             self.DE_EX._empty(False)
 
+        # IF
         if self.IF_DE._empty() is True and self.fetchUnit._stalled() is False :
             self.IF_DE, stallCount = self.fetchUnit.fetchNext(PC, INSTR, self.IF_DE, instructionFetchCount, stallCount)
             self.IF_DE._empty(False)

@@ -13,57 +13,57 @@
 
 //Initialise b
 ADDI r1, r0, 4
-STRC r1, 11
+STRC r1, r0, 11
 ADDI r1, r0, 7
-STRC r1, 12
+STRC r1, r0, 12
 ADDI r1, r0, 2
-STRC r1, 13
+STRC r1, r0, 13
 ADDI r1, r0, 88
-STRC r1, 14
+STRC r1, r0, 14
 ADDI r1, r0, 4
-STRC r1, 15
+STRC r1, r0, 15
 ADDI r1, r0, 7
-STRC r1, 16
+STRC r1, r0, 16
 ADDI r1, r0, 2
-STRC r1, 17
+STRC r1, r0, 17
 ADDI r1, r0, 101
-STRC r1, 18
+STRC r1, r0, 18
 ADDI r1, r0, 67
-STRC r1, 19
+STRC r1, r0, 19
 ADDI r1, r0, 321
-STRC r1, 20
+STRC r1, r0, 20
 
 //Initialise c
 ADDI r1, r0, 87
-STRC r1, 22
+STRC r1, r0, 22
 ADDI r1, r0, 5
-STRC r1, 23
+STRC r1, r0, 23
 ADDI r1, r0, 9
-STRC r1, 24
+STRC r1, r0, 24
 ADDI r1, r0, 2
-STRC r1, 25
+STRC r1, r0, 25
 ADDI r1, r0, 41
-STRC r1, 26
+STRC r1, r0, 26
 ADDI r1, r0, 23
-STRC r1, 27
+STRC r1, r0, 27
 ADDI r1, r0, 54
-STRC r1, 28
+STRC r1, r0, 28
 ADDI r1, r0, 874
-STRC r1, 29
+STRC r1, r0, 29
 ADDI r1, r0, 2
-STRC r1, 30
+STRC r1, r0, 30
 ADDI r1, r0, 3
-STRC r1, 31
+STRC r1, r0, 31
 
 //Initialise i and endOfLoop check
 ADD r1, r0, r0
 ADDI r2, r0, 10
 
 loop:
-LD r3, r1, 11
-LD r4, r1, 22
+LDC r3, r1, 11
+LDC r4, r1, 22
 ADD r5, r3, r4
-STR r5, r1, 0
+STR r5, r1, r0
 ADDI r1, r1, 1
 BLT r1, r2, loop
 

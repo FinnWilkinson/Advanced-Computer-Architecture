@@ -3,12 +3,13 @@ import sys
 import numpy as np
 from Register_File import RegFile
 
-def printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount) :
+def printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount) :
     np.set_printoptions(threshold=sys.maxsize, linewidth=300)
     tempMEM = np.reshape(MEM, (-1, 32))
     os.system('cls||clear')
 
-    print("│ PC = {} │ Cycles = {} │ Instructions Fetched = {} │ Instructions Executed = {} | Branches Executed = {} | Branches Taken = {} | Stalls = {}" .format(PC, cycles, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount))
+    print("│ PC = {} │ Cycles = {} │ Instructions Fetched = {} │ Instructions Executed = {} | Instructions Executed This Cycle = {} | Average ILP = {} |" .format(PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP))
+    print("| Branches Executed = {} | Branches Taken = {} | Correct Branch Predictions = {} | Stalls = {} |" .format(branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount))
     print()
     print("Register File :")
     print("────────────────")

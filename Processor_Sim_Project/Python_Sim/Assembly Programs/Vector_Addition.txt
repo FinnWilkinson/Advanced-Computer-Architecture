@@ -55,6 +55,12 @@ STRC r1, r0, 30
 ADDI r1, r0, 3
 STRC r1, r0, 31
 
+//main loop added around core core (i.e. not initialising memory) to get a better ILP average
+//r23 used for loop max, r22 used for loop counter
+ADDI r23, r0, 100
+ADD r22, r0, r0
+Main:
+
 //Initialise i and endOfLoop check
 ADD r1, r0, r0
 ADDI r2, r0, 10
@@ -67,4 +73,6 @@ STR r5, r1, r0
 ADDI r1, r1, 1
 BLT r1, r2, loop
 
+ADDI r22, r22, 1
+BLT r22, r23, Main
 HALT

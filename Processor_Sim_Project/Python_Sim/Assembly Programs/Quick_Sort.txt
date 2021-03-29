@@ -1,4 +1,4 @@
-// Sorting the array :
+// Sorting the array
 // [570, 151, 394, 597, 756, 424, 610, 5, 883, 299, 
 //  162, 320, 366, 917, 481, 842, 545, 722, 438, 109,
 //  618, 631, 506, 958, 318, 238, 900, 341, 34, 261]
@@ -97,10 +97,17 @@ ADDI r1, r0, 261
 STR r1, r0, r2
 ADDI r2, r2, 1
 
-// Begin quick sort NEXT LINE BELOW IS PC = 91
+
+//main loop added around core core (i.e. not initialising memory) to get a better ILP average
+//r23 used for loop max, r22 used for loop counter
+ADDI r23, r0, 100
+ADD r22, r0, r0
+Main:
+
 // r1 = array start location, r2 = array end location
 // r3 = low index, r4 = high index, r5 = partition index
 // r30 = return pointer, r31 = stack pointer
+
 ADDI r1, r0, 0
 ADDI r2, r0, 29
 ADD r3, r0, r1
@@ -168,7 +175,7 @@ STRC r5, r31, 2
 ADDI r31, r31, 3
 
 //save return address
-ADDI r30, r0, 131
+ADDI r30, r0, Load
 STR r30, r31, r0
 ADDI r31, r31, 1
 
@@ -177,6 +184,7 @@ SUBI r4, r5, 1
 BR Quicksort
 
 //PC below = 131
+Load:
 LDC r5, r31, -1
 LDC r4, r31, -2
 LDC r3, r31, -3
@@ -187,4 +195,6 @@ ADDI r3, r5, 1
 BR Quicksort
 
 End:
+ADDI r22, r22, 1
+BLT r22, r23, Main
 HALT

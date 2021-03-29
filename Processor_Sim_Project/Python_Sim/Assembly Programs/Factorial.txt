@@ -12,6 +12,13 @@ STRC r1, r0, 0
 //	output = output * value
 //return output
 
+
+//main loop added around core core (i.e. not initialising memory) to get a better ILP average
+//r23 used for loop max, r22 used for loop counter
+ADDI r23, r0, 100
+ADD r22, r0, r0
+Main:
+
 //r1 = value, 	r2 = output, 	r3 = 12 (max loop val)
 ADDI r1, r0, 1
 ADDI r2, r0, 1
@@ -25,4 +32,6 @@ BR Loop
 
 End:
 STRC r2, r0, 2
+ADDI r22, r22, 1
+BLT r22, r23, Main
 HALT 

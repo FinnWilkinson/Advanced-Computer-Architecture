@@ -88,5 +88,5 @@ def getPlaceHolders(filename) :
                 count += 1
         else :
             count += 1
-
+            
     return holders

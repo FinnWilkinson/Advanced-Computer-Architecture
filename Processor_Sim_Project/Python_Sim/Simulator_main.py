@@ -17,6 +17,7 @@ branchExecutedCount = 0
 branchTakenCount = 0
 correctBranchPreds = 0
 stallCount = 0
+flushCount = 0
 instructionsExeThisCycle = 0
 averageILP = 0.0
 
@@ -42,11 +43,11 @@ if __name__=="__main__" :
 
     #Effective clock, advancing pipeline
     while not finished :
-        if(len(sys.argv) > 2 and sys.argv[2] == "-verbose") :
+        if(len(sys.argv) > 2 and sys.argv[2] == "--verbose") :
             # Print initial system information at users discretion
-            printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount)
+            printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)
         instructionsExeThisCycle = instructionExecuteCount
-        PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, finished, RF, MEM, error = pipeline_0.advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, finished, RF, MEM, INSTR, error)
+        PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, RF, MEM, error = pipeline_0.advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, RF, MEM, INSTR, error)
         cycles += 1
         instructionsExeThisCycle = instructionExecuteCount - instructionsExeThisCycle
         averageILP = round(instructionExecuteCount / cycles, 2)
@@ -56,4 +57,4 @@ if __name__=="__main__" :
             sys.exit(1)
 
     # Print final system information
-    printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount)
+    printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)

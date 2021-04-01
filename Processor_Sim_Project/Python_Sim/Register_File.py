@@ -6,6 +6,13 @@ class RegFile :
 
     def __init__(self) :
         self.Register = [0] * 32
+        self.regInUse = [0] * 32   # 0 = NOT in use,   1 = in use
+
+    def _inUse(self, index, input=None) :
+        if input is not None :
+            self.regInUse[index] = input
+        else :
+            return self.regInUse[index]
 
     def Get(self, reg) :
         if(reg == "r0") :

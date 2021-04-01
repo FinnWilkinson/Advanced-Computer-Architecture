@@ -18,6 +18,8 @@
  BLT ra, rb, x           # if RF[ra] < RF[rb] then PC = x;                                               (where 'x' is an immidiate constant)
  LSL rd, ra, x		 # RF[rd] = RF[ra] << x
  LSR rd, ra, x 		 # RF[rd] = RF[ra] >> x
+ XOR rd, ra, rb		 # RF[rd] = RF[ra] XOR RF[rb]
+ AND rd, ra, rb   	 # RF[rd] = RF[ra] AND RF[rb]
 
 
 

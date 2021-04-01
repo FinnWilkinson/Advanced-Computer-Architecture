@@ -210,6 +210,7 @@ ADDI r7, r0, 4
 //b = i*offset + 0 + 1 + 2 + 3 + 4 + 5 . .
 //c = (offset*0) + j, (offset * 1) + j ...
 
+
 LoadBVals:
 //B index = (r20), C index = (r21)
 // Load Matricies into registers
@@ -253,7 +254,7 @@ ADD r21, r21, r6
 LD r19, r4, r21
 BR Loop
 
- 
+
 Loop:
 //r20-r25 = current A parts
 //r26 = A to store
@@ -274,7 +275,7 @@ ADD r26, r26, r25
 STR r26, r1, r0
 ADDI r1, r1, 1
 ADDI r6, r6, 1
-//if j = 4, load new C column
+//if j < 4, load new C column
 BLT r6, r7, LoadCVals
 //else i++ j=0, load all values
 ADDI r5, r5, 1
@@ -287,11 +288,3 @@ End:
 ADDI r30, r30, 1
 BLT r30, r31, Main
 HALT
-
-
-
-
-
-
-
-

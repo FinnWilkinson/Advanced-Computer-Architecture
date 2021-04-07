@@ -8,6 +8,7 @@ class Fetch_Unit :
     def fetchNext(self, PC, INSTR, IF_DE, instructionCount) :
         nextInstruction = INSTR[PC]
         nextInstruction.instructionNumber = instructionCount
-        IF_DE._instruction(nextInstruction)
+        IF_DE.Instruction = nextInstruction
+        # Branch prediction target address
             
         return IF_DE

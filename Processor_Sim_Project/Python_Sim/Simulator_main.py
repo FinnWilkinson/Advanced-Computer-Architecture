@@ -1,11 +1,8 @@
 from Instruction import Instruction
-from Register_File import RegFile
+from Register_File import *
 from Pipeline import Pipeline
 from Print import *
 from Load_Assembly import *
-#from Fetch import *
-#from Decode import *
-#from Execute import *
 
 # Global values
 finished = False
@@ -21,7 +18,7 @@ flushCount = 0
 instructionsExeThisCycle = 0
 averageILP = 0.0
 
-RF = RegFile()                            # Register file. RF[0] or r0 is always = 0
+ARF = ARegFile()                            # Register file. ARF[0] or r0 is always = 0
 MEM = [0] * 1024                          # Data memory
 INSTR = [Instruction(0,0,0,0,0)] * 512    # Instruction memory
 
@@ -45,9 +42,9 @@ if __name__=="__main__" :
     while not finished :
         if(len(sys.argv) > 2 and sys.argv[2] == "--verbose") :
             # Print initial system information at users discretion
-            printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)
+            printSysInfo(ARF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)
         instructionsExeThisCycle = instructionExecuteCount
-        PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, RF, MEM, error = pipeline_0.advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, RF, MEM, INSTR, error)
+        PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, ARF, MEM, error = pipeline_0.advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, ARF, MEM, INSTR, error)
         cycles += 1
         instructionsExeThisCycle = instructionExecuteCount - instructionsExeThisCycle
         averageILP = round(instructionExecuteCount / cycles, 2)
@@ -57,4 +54,4 @@ if __name__=="__main__" :
             sys.exit(1)
 
     # Print final system information
-    printSysInfo(RF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)
+    printSysInfo(ARF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)

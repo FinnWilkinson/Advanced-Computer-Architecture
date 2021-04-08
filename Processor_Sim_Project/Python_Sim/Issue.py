@@ -12,13 +12,14 @@ class Issue_Unit :
     def issueInstruction(self, RS, IS_EX, ARF, stallThisCycle) :
         # When instruction issued, validation bit in ARF for that register set to NOT valid
         # Only issue instructions that have all operands Valid
+
         proceed = [True] * 3    # 0 = ARITHMETIC, 1 = LOAD / STORE, 2 = BRANCH / LOGIC
-        #FIFO system
+        #FIFO Issuing System
         for i in range(0,3) :
             if(len(RS[i].Instruction) > 0) :
                 # ARITHMETIC
-                if i == 0 :
-                    if IS_EX.Empty[0] == True :
+                if(i == 0) :
+                    if(IS_EX.Empty[0] == True) :
                         # Check if all fields are available to read from or write to
                         if("r" in str(RS[i].Instruction[0].operand1)) :
                             if(ARF.regInUse[regToRegIndex(RS[i].Instruction[0].operand1)] != 0) :
@@ -29,7 +30,7 @@ class Issue_Unit :
                         if("r" in str(RS[i].Instruction[0].operand3)) :
                             if(ARF.regInUse[regToRegIndex(RS[i].Instruction[0].operand3)] != 0) :
                                 proceed[0] = False
-                    elif IS_EX.Empty[1] == True :
+                    elif(IS_EX.Empty[1] == True) :
                         # Check if all fields are available to read from or write to
                         if("r" in str(RS[i].Instruction[0].operand1)) :
                             if(ARF.regInUse[regToRegIndex(RS[i].Instruction[0].operand1)] != 0) :
@@ -44,8 +45,8 @@ class Issue_Unit :
                         proceed[0] = False
                 
                 # LOAD/STORE
-                elif i == 1 :
-                    if IS_EX.Empty[2] == True :
+                elif(i == 1) :
+                    if(IS_EX.Empty[2] == True) :
                         # Check if all fields are available to read from or write to
                         if("r" in str(RS[i].Instruction[0].operand1)) :
                             if(ARF.regInUse[regToRegIndex(RS[i].Instruction[0].operand1)] != 0) :
@@ -61,7 +62,7 @@ class Issue_Unit :
                 
                 # BRANCH/LOGIC
                 else :
-                    if IS_EX.Empty[3] == True :
+                    if(IS_EX.Empty[3] == True) :
                         # Check if all fields are available to read from or write to
                         if("r" in str(RS[i].Instruction[0].operand1)) :
                             if(ARF.regInUse[regToRegIndex(RS[i].Instruction[0].operand1)] != 0) :
@@ -80,28 +81,28 @@ class Issue_Unit :
 
 
         # Ensure  we execute in order
-        if proceed[0] == True:
-            if RS[0].Instruction[0].instructionNumber != self.nextInstruction :
+        if(proceed[0] == True) :
+            if(RS[0].Instruction[0].instructionNumber != self.nextInstruction) :
                 proceed[0] = False
         
-        if proceed[1] == True:
-            if RS[1].Instruction[0].instructionNumber != self.nextInstruction :
+        if(proceed[1] == True) :
+            if(RS[1].Instruction[0].instructionNumber != self.nextInstruction) :
                 proceed[1] = False
         
-        if proceed[2] == True:
-            if RS[2].Instruction[0].instructionNumber != self.nextInstruction :
+        if(proceed[2] == True) :
+            if(RS[2].Instruction[0].instructionNumber != self.nextInstruction) :
                 proceed[2] = False
 
        
 
 
         issueCount = 0
-        if proceed[0] == True:
+        if(proceed[0] == True) :
             # If opcode does operation that writes to ARF then set that register to invalid
             if(RS[0].Instruction[0].opCode not in self.readOnlyINSTR) :
                 ARF.regInUse[regToRegIndex(RS[0].Instruction[0].operand1)] = 1
             # Issue to appropriate EU
-            if IS_EX.Empty[0] == True :
+            if(IS_EX.Empty[0] == True) :
                 IS_EX.Instruction[0] = copy.copy(RS[0].Instruction[0])
                 IS_EX.TargetAddress[0] = copy.copy(RS[0].TargetAddress[0])
                 IS_EX.Empty[0] = False
@@ -114,7 +115,7 @@ class Issue_Unit :
             RS[0].TargetAddress.pop(0)
             issueCount += 1
 
-        if proceed[1] == True:
+        if(proceed[1] == True) :
             # If opcode does operation that writes to ARF then set that register to invalid
             if(RS[1].Instruction[0].opCode not in self.readOnlyINSTR) :
                 ARF.regInUse[regToRegIndex(RS[1].Instruction[0].operand1)] = 1
@@ -127,7 +128,7 @@ class Issue_Unit :
             RS[1].TargetAddress.pop(0)
             issueCount += 1
 
-        if proceed[2] == True:
+        if(proceed[2] == True) :
             # If opcode does operation that writes to ARF then set that register to invalid
             if(RS[2].Instruction[0].opCode not in self.readOnlyINSTR) :
                 ARF.regInUse[regToRegIndex(RS[2].Instruction[0].operand1)] = 1
@@ -145,4 +146,4 @@ class Issue_Unit :
         else :
             self.nextInstruction += issueCount
 
-        return stallThisCycle
+        return stallThisCycle                    

@@ -37,16 +37,19 @@ class Pipeline:
             if(self.IS_EX.Empty[i] is False) :
                 output = None
                 error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output = self.EU[i].executeInstruction(self.IS_EX, i, ARF, MEM, PC, finished, branchExecutedCount, branchTakenCount)
-                if(error == 1) : #if branch traken, flush pipeline
+                if(error == 1) : # If branch traken, flush pipeline
                     flushCount = self.flush(self.IS_EX.Instruction[i].instructionNumber, flushCount, ARF, instructionFetchCount)
-                    error = 0   #reset error for Main to process correctly
-                self.IS_EX.Empty[i] = True
-                self.ROB.Instruction.append(self.IS_EX.Instruction[i])
-                self.ROB.Value.append(output)
-                instructionExecuteCount += 1
+                    error = 0   # Reset error for Main to process correctly
+                if(error != 2) :  # If multi-cycle instruction, delay output
+                    self.IS_EX.Empty[i] = True
+                    self.ROB.Instruction.append(self.IS_EX.Instruction[i])
+                    self.ROB.Value.append(output)
+                    instructionExecuteCount += 1
+                else :
+                    error = 0   # Reset error for Main to process correctly
                 
             
-        # ISSUE (IS) - Issue to IS_EX's
+        # ISSUE (IS) - Proper Dependancy and OoO scheduling
         tempStallIndicator = self.issueUnit.issueInstruction(self.RS, self.IS_EX, ARF, stallThisCycle)
         if tempStallIndicator == True and instructionFetchCount > 2 :
             stallThisCycle = True

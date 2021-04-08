@@ -5,6 +5,7 @@ from Reg_To_Reg_Index import *
 # ARITHMETIC EXECUTION UNIT
 class ARITH_Execution_Unit :
     def __init__(self) :
+        self.ExecutionCount = 0
         return
 
     def executeInstruction(self, IS_EX, EUindex, ARF, MEM, PC, finished, branchExecutedCount, branchTakenCount) :
@@ -14,6 +15,7 @@ class ARITH_Execution_Unit :
         # Invalid due to branch mispredict
         if currentInstruction.Valid == False :
             return error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output
+        
         # ADD
         if currentInstruction.opCode == "ADD": 
             output = ARF.Register[regToRegIndex(currentInstruction.operand2)] + ARF.Register[regToRegIndex(currentInstruction.operand3)]
@@ -28,16 +30,40 @@ class ARITH_Execution_Unit :
             output = ARF.Register[regToRegIndex(currentInstruction.operand2)] - int(currentInstruction.operand3)
         # MUL
         elif currentInstruction.opCode == "MUL": 
-            output = ARF.Register[regToRegIndex(currentInstruction.operand2)] * ARF.Register[regToRegIndex(currentInstruction.operand3)]
+            # Introduce 3 cycle latency for Multiplication
+            if(self.ExecutionCount == 2) :
+                output = ARF.Register[regToRegIndex(currentInstruction.operand2)] * ARF.Register[regToRegIndex(currentInstruction.operand3)]
+                self.ExecutionCount = 0     # Re-set execution count
+            else :
+                error = 2       # Cycle delay occured
+                self.ExecutionCount += 1
         # MULI
         elif currentInstruction.opCode == "MULI": 
-            output = ARF.Register[regToRegIndex(currentInstruction.operand2)] * int(currentInstruction.operand3)
+            # Introduce 3 cycle latency for Multiplication
+            if(self.ExecutionCount == 2) :
+                output = ARF.Register[regToRegIndex(currentInstruction.operand2)] * int(currentInstruction.operand3)
+                self.ExecutionCount = 0     # Re-set execution count
+            else :
+                error = 2       # Cycle delay occured
+                self.ExecutionCount += 1
         # DIV
         elif currentInstruction.opCode == "DIV": 
-            output = ARF.Register[regToRegIndex(currentInstruction.operand2)] / ARF.Register[regToRegIndex(currentInstruction.operand3)]
+            # Introduce 16 cycle latency for Division
+            if(self.ExecutionCount == 15) :
+                output = ARF.Register[regToRegIndex(currentInstruction.operand2)] / ARF.Register[regToRegIndex(currentInstruction.operand3)]
+                self.ExecutionCount = 0     # Re-set execution count
+            else :
+                error = 2       # Cycle delay occured
+                self.ExecutionCount += 1
         # DIVI
         elif currentInstruction.opCode == "DIVI": 
-            output = ARF.Register[regToRegIndex(currentInstruction.operand2)] / int(currentInstruction.operand3)
+            # Introduce 16 cycle latency for Division
+            if(self.ExecutionCount == 15) :
+                output = ARF.Register[regToRegIndex(currentInstruction.operand2)] / int(currentInstruction.operand3)
+                self.ExecutionCount = 0     # Re-set execution count
+            else :
+                error = 2       # Cycle delay occured
+                self.ExecutionCount += 1
         # Opcode not recognised
         else: 
             print("ERROR - Opcode '{}' not recognised. Exiting..." .format(currentInstruction.opCode))
@@ -48,6 +74,7 @@ class ARITH_Execution_Unit :
 # LOAD / STORE EXECUTION UNIT
 class LDSTR_Execution_Unit :
     def __init__(self) :
+        self.ExecutionCount = 0
         return
 
     def executeInstruction(self, IS_EX, EUindex, ARF, MEM, PC, finished, branchExecutedCount, branchTakenCount) :
@@ -57,22 +84,29 @@ class LDSTR_Execution_Unit :
         # Invalid due to branch mispredict
         if currentInstruction.Valid == False :
             return error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output
-        # LD
-        if currentInstruction.opCode == "LD": 
-            output = MEM[ARF.Register[regToRegIndex(currentInstruction.operand2)] + ARF.Register[regToRegIndex(currentInstruction.operand3)]]
-        # LDC
-        elif currentInstruction.opCode == "LDC": 
-            output = MEM[ARF.Register[regToRegIndex(currentInstruction.operand2)] + int(currentInstruction.operand3)]
-        # STR
-        elif currentInstruction.opCode == "STR": 
-            MEM[ARF.Register[regToRegIndex(currentInstruction.operand2)] + ARF.Register[regToRegIndex(currentInstruction.operand3)]] = ARF.Register[regToRegIndex(currentInstruction.operand1)]
-        # STRC
-        elif currentInstruction.opCode == "STRC":
-            MEM[ARF.Register[regToRegIndex(currentInstruction.operand2)] + int(currentInstruction.operand3)] = ARF.Register[regToRegIndex(currentInstruction.operand1)]
-        # Opcode not recognised
-        else: 
-            print("ERROR - Opcode '{}' not recognised. Exiting..." .format(currentInstruction.opCode))
-            error = -1
+        
+        # Introduce 2 cycle latency for Load and Stores (Replicating L1 cache latency)
+        if(self.ExecutionCount == 1) :
+            # LD
+            if currentInstruction.opCode == "LD": 
+                output = MEM[ARF.Register[regToRegIndex(currentInstruction.operand2)] + ARF.Register[regToRegIndex(currentInstruction.operand3)]]
+            # LDC
+            elif currentInstruction.opCode == "LDC": 
+                output = MEM[ARF.Register[regToRegIndex(currentInstruction.operand2)] + int(currentInstruction.operand3)]
+            # STR
+            elif currentInstruction.opCode == "STR": 
+                MEM[ARF.Register[regToRegIndex(currentInstruction.operand2)] + ARF.Register[regToRegIndex(currentInstruction.operand3)]] = ARF.Register[regToRegIndex(currentInstruction.operand1)]
+            # STRC
+            elif currentInstruction.opCode == "STRC":
+                MEM[ARF.Register[regToRegIndex(currentInstruction.operand2)] + int(currentInstruction.operand3)] = ARF.Register[regToRegIndex(currentInstruction.operand1)]
+            # Opcode not recognised
+            else: 
+                print("ERROR - Opcode '{}' not recognised. Exiting..." .format(currentInstruction.opCode))
+                error = -1
+            self.ExecutionCount = 0     # Re-set execution count
+        else :
+            self.ExecutionCount += 1
+            error = 2   # Cycle delay occured
         return error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output
 
 

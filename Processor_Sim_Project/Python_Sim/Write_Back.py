@@ -6,6 +6,7 @@ import copy as copy
 class Write_Back_Unit :
     def __init__(self) :
         self.nextInstruction = 0
+        self.noWriteBack = ["STR", "STRC", "JMP", "BR", "BLT", "BEQ"]
         return
 
     def writeBack(self, ROB, ARF) :

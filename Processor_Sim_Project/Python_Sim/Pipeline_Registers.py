@@ -11,10 +11,11 @@ class ReservationStation :
     def __init__(self) :
         self.Instruction = list()
         self.TargetAddress = list()     # Used for branch target address
-        self.Q1 = list()                # Reservation station index that will produce s1. Value of 0 = s1 available
-        self.Q2 = list()                # Reservation station index that will produce s2. Value of 0 = s2 available
-        self.Q3 = list()                # Reservation station index that will produce s2. Value of 0 = s3 available
-        self.Busy = 0                   # Accompanying EU(s) occupied, 0 = Free, 1 = Busy
+        self.Op = list()                # Operation used on s1, s2
+        self.D1 = list()                # Destination address
+        self.S1 = list()                # Operand 1
+        self.S2 = list()                # Operand 2
+
     
     def flush(self, instructionNumber) :
         for j in range(0, len(self.Instruction)) :

@@ -1,6 +1,6 @@
 from Instruction import Instruction
-from Register_File import *
 from Reg_To_Reg_Index import *
+import copy as copy
 
 # Instructions:
 # HALT = 0, ADD = 1, ADDI = 2, SUB = 3, SUBI = 4, MUL = 5, MULI = 6, DIV = 7, DIVI = 8, LD = 9,
@@ -14,26 +14,33 @@ class Decode_Unit :
         self.loadStoreInstructions = ["LD", "LDC", "STR", "STRC"]
         self.logicInstructions = ["HALT", "LSL", "LSR", "AND", "XOR"]
 
-    def decodeInstruction(self, IF_DE, DE_IS, ARF) :
-        # Get instruction Type = 0,1,2,3 (branch, load/store, arithmetic, logic)
-        # Calc. target address
-
-        nextInstruction = IF_DE.Instruction
-
-        if nextInstruction.opCode in self.branchInstructions :
-            DE_IS.Type = 0
-        elif nextInstruction.opCode in self.loadStoreInstructions :
-            DE_IS.Type = 1
-        elif nextInstruction.opCode in self.logicInstructions :
-            DE_IS.Type = 3
+    def decodeInstruction(self, IF_DE, RS, ARF, stallThisCycle) :
+        # Add to BRACH/LOGIC RS
+        if IF_DE.Instruction.opCode in self.branchInstructions or IF_DE.Instruction.opCode in self.logicInstructions :
+            if(len(RS[2].Instruction) < 8) :
+                RS[2].Instruction.append(copy.copy(IF_DE.Instruction))
+                RS[2].TargetAddress.append(0)
+                IF_DE.Empty = True
+            else :
+                stallThisCycle = True
+        # Add to LOAD/STORE RS
+        elif IF_DE.Instruction.opCode in self.loadStoreInstructions :
+            if(len(RS[1].Instruction) < 8) :
+                RS[1].Instruction.append(copy.copy(IF_DE.Instruction))
+                RS[1].TargetAddress.append(0)
+                IF_DE.Empty = True
+            else :
+                stallThisCycle = True
+        # Add to ARITHMETIC RS
         else :
-            DE_IS.Type = 2
-
-        DE_IS.Instruction = nextInstruction
-        DE_IS.TargetAddress = (IF_DE.TargetAddress)
-    
-        return IF_DE, DE_IS
+            if(len(RS[0].Instruction) < 16) :
+                RS[0].Instruction.append(copy.copy(IF_DE.Instruction))
+                RS[0].TargetAddress.append(0)
+                IF_DE.Empty = True
+            else :
+                stallThisCycle = True
         
-
-
+        
     
+        return stallThisCycle
+        

@@ -1,14 +1,24 @@
 from Instruction import Instruction
+import copy as copy
 
 class Fetch_Unit :
 
     def __init__(self) :
         return
 
-    def fetchNext(self, PC, INSTR, IF_DE, instructionCount) :
+    def fetchNext(self, PC, INSTR, IF_DE, instructionFetchCount) :
         nextInstruction = INSTR[PC]
-        nextInstruction.instructionNumber = instructionCount
-        IF_DE.Instruction = nextInstruction
+        # Stops OoO program crashes due to unknown opcode
+        if nextInstruction.opCode == 0 :
+            IF_DE.Empty = True
+            return PC, instructionFetchCount
+        nextInstruction.instructionNumber = instructionFetchCount
+        nextInstruction.Valid = True
+        IF_DE.Instruction = copy.copy(nextInstruction)
         # Branch prediction target address
+
+        IF_DE.Empty = False
+        PC += 1
+        instructionFetchCount += 1
             
-        return IF_DE
+        return PC, instructionFetchCount

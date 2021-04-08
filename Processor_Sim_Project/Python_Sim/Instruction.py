@@ -6,3 +6,4 @@ class Instruction :
         self.operand2 = operand2
         self.operand3 = operand3
         self.instructionNumber = instructionNumber
+        self.Valid = True

@@ -9,24 +9,15 @@ class Write_Back_Unit :
         self.noWriteBack = ["STR", "STRC", "JMP", "BR", "BLT", "BEQ"]
         return
 
-    def writeBack(self, ROB, ARF) :
-        if(len(ROB.Instruction) > 0) :
-            for i in range(0, len(ROB.Instruction)) :
-                print(ROB.Instruction[i].instructionNumber)
-                inNoWriteBackList = False
-                if(ROB.Instruction[i].instructionNumber == self.nextInstruction) :
-                    if(ROB.Instruction[i].opCode in self.noWriteBack) :
-                        inNoWriteBackList = True
-                    if(ROB.Instruction[i].Valid != False) :
-                        if(ROB.Value[i] != None) :
-                            ARF.Register[regToRegIndex(ROB.Instruction[i].operand1)] = copy.copy(ROB.Value[i])
-                    if("r" in str(ROB.Instruction[i].operand1) and not inNoWriteBackList) :
-                        ARF.regInUse[regToRegIndex(ROB.Instruction[i].operand1)] = 0
-                    print("Written Back {}, freed {}" .format(ROB.Instruction[i].instructionNumber, ROB.Instruction[i].operand1))
-                    ROB.Instruction.pop(i)
-                    ROB.Value.pop(i)
-                    self.nextInstruction += 1
-                    if(inNoWriteBackList == False) :
-                        break   
+    def writeBack(self, ROB, RAT, ARF) :
+        # If read only instruction in place, move to next item in ROB
+        if(ROB.Register[ROB.CommitPtr] == "SKIP") :
+            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 128)
+            return
 
-        return ARF
+        if(ROB.Complete[ROB.CommitPtr] == 1) :
+            ARF.Register[int(ROB.Register[ROB.CommitPtr][1:])] = copy.copy(ROB.Value[ROB.CommitPtr])
+            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 128)
+            
+
+        return 

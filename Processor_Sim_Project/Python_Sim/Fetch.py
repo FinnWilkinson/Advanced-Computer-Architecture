@@ -17,8 +17,9 @@ class Fetch_Unit :
         nextInstruction.instructionNumber = instructionFetchCount
         nextInstruction.Valid = True
         IF_DE.Instruction = copy.copy(nextInstruction)
-        
+
         # Branch prediction target address
+        IF_DE.TargetAddress = 0
 
         IF_DE.Empty = False
         PC += 1

@@ -23,6 +23,9 @@ ARF = ARegFile()                            # Register file. ARF[0] or r0 is alw
 MEM = [0] * 1024                            # Data memory
 INSTR = [Instruction(0,0,0,0,0)] * 512      # Instruction memory
 
+ROB = ReOrderBuffer()
+RAT = RegAddrTable()
+
 pipeline_0 = Pipeline()
 
 if __name__=="__main__" :
@@ -43,10 +46,9 @@ if __name__=="__main__" :
     while not finished :
         if(len(sys.argv) > 2 and sys.argv[2] == "--verbose") :
             # Print initial system information at users discretion
-            print(ARF.regInUse)
             printSysInfo(ARF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)
         instructionsExeThisCycle = instructionExecuteCount
-        PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, ARF, MEM, error = pipeline_0.advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, ARF, MEM, INSTR, error)
+        PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, ARF, MEM, ROB, RAT, error = pipeline_0.advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, ARF, MEM, INSTR, ROB, RAT, error)
         cycles += 1
         instructionsExeThisCycle = instructionExecuteCount - instructionsExeThisCycle
         averageILP = round(instructionExecuteCount / cycles, 2)

@@ -7,6 +7,5 @@ class ARegFile :
 
     def __init__(self) :
         self.Register = [0] * 32
-        self.regInUse = [0] * 32   # 0 = Valid,   1 = Not Valid
 
     

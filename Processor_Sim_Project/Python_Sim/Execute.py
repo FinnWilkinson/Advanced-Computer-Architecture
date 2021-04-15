@@ -11,110 +11,58 @@ class ARITH_Execution_Unit :
     def executeInstruction(self, IS_EX, EUindex, ARF, MEM, PC, finished, branchExecutedCount, branchTakenCount) :
         output = None
         error = 0
-        currentInstruction = IS_EX.Instruction[EUindex]
-        # Invalid due to branch mispredict
-        if currentInstruction.Valid == False :
-            return error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output
 
         # ADD
-        if IS_EX.Op[EUindex] == "ADD": 
-            output = IS_EX.S1[EUindex] + IS_EX.S2[EUindex]
+        if IS_EX[EUindex].Op == "ADD": 
+            output = IS_EX[EUindex].S1 + IS_EX[EUindex].S2
         # ADDI
-        elif IS_EX.Op[EUindex] == "ADDI": 
-            output = IS_EX.S1[EUindex] + IS_EX.S2[EUindex]
+        elif IS_EX[EUindex].Op == "ADDI": 
+            output = IS_EX[EUindex].S1 + IS_EX[EUindex].S2
         # SUB
-        elif IS_EX.Op[EUindex] == "SUB": 
-            output = IS_EX.S1[EUindex] - IS_EX.S2[EUindex]
+        elif IS_EX[EUindex].Op == "SUB": 
+            output = IS_EX[EUindex].S1 - IS_EX[EUindex].S2
         # SUBI
-        elif IS_EX.Op[EUindex] == "SUBI": 
-            output = IS_EX.S1[EUindex] - IS_EX.S2[EUindex]
+        elif IS_EX[EUindex].Op == "SUBI": 
+            output = IS_EX[EUindex].S1 - IS_EX[EUindex].S2
         # MUL
-        elif IS_EX.Op[EUindex] == "MUL": 
+        elif IS_EX[EUindex].Op == "MUL": 
             # Introduce 3 cycle latency for Multiplication
             if(self.ExecutionCount == 2) :
-                output = IS_EX.S1[EUindex] * IS_EX.S2[EUindex]
+                output = IS_EX[EUindex].S1 * IS_EX[EUindex].S2
                 self.ExecutionCount = 0     # Re-set execution count
             else :
                 error = 2       # Cycle delay occured
                 self.ExecutionCount += 1
         # MULI
-        elif IS_EX.Op[EUindex] == "MULI": 
+        elif IS_EX[EUindex].Op == "MULI": 
             # Introduce 3 cycle latency for Multiplication
             if(self.ExecutionCount == 2) :
-                output = IS_EX.S1[EUindex] * IS_EX.S2[EUindex]
+                output = IS_EX[EUindex].S1 * IS_EX[EUindex].S2
                 self.ExecutionCount = 0     # Re-set execution count
             else :
                 error = 2       # Cycle delay occured
                 self.ExecutionCount += 1
         # DIV
-        elif IS_EX.Op[EUindex] == "DIV": 
+        elif IS_EX[EUindex].Op == "DIV": 
             # Introduce 16 cycle latency for Division
             if(self.ExecutionCount == 15) :
-                output = IS_EX.S1[EUindex] / IS_EX.S2[EUindex]
+                output = IS_EX[EUindex].S1 / IS_EX[EUindex].S2
                 self.ExecutionCount = 0     # Re-set execution count
             else :
                 error = 2       # Cycle delay occured
                 self.ExecutionCount += 1
         # DIVI
-        elif IS_EX.Op[EUindex] == "DIVI": 
+        elif IS_EX[EUindex].Op == "DIVI": 
             # Introduce 16 cycle latency for Division
             if(self.ExecutionCount == 15) :
-                output = IS_EX.S1[EUindex] / IS_EX.S2[EUindex]
+                output = IS_EX[EUindex].S1 / IS_EX[EUindex].S2
                 self.ExecutionCount = 0     # Re-set execution count
             else :
                 error = 2       # Cycle delay occured
                 self.ExecutionCount += 1
-        # # ADD
-        # if currentInstruction.opCode == "ADD": 
-        #     output = ARF.Register[regToRegIndex(currentInstruction.operand2)] + ARF.Register[regToRegIndex(currentInstruction.operand3)]
-        # # ADDI
-        # elif currentInstruction.opCode == "ADDI": 
-        #     output = ARF.Register[regToRegIndex(currentInstruction.operand2)] + int(currentInstruction.operand3)
-        # # SUB
-        # elif currentInstruction.opCode == "SUB": 
-        #     output = ARF.Register[regToRegIndex(currentInstruction.operand2)] - ARF.Register[regToRegIndex(currentInstruction.operand3)]
-        # # SUBI
-        # elif currentInstruction.opCode == "SUBI": 
-        #     output = ARF.Register[regToRegIndex(currentInstruction.operand2)] - int(currentInstruction.operand3)
-        # # MUL
-        # elif currentInstruction.opCode == "MUL": 
-        #     # Introduce 3 cycle latency for Multiplication
-        #     if(self.ExecutionCount == 2) :
-        #         output = ARF.Register[regToRegIndex(currentInstruction.operand2)] * ARF.Register[regToRegIndex(currentInstruction.operand3)]
-        #         self.ExecutionCount = 0     # Re-set execution count
-        #     else :
-        #         error = 2       # Cycle delay occured
-        #         self.ExecutionCount += 1
-        # # MULI
-        # elif currentInstruction.opCode == "MULI": 
-        #     # Introduce 3 cycle latency for Multiplication
-        #     if(self.ExecutionCount == 2) :
-        #         output = ARF.Register[regToRegIndex(currentInstruction.operand2)] * int(currentInstruction.operand3)
-        #         self.ExecutionCount = 0     # Re-set execution count
-        #     else :
-        #         error = 2       # Cycle delay occured
-        #         self.ExecutionCount += 1
-        # # DIV
-        # elif currentInstruction.opCode == "DIV": 
-        #     # Introduce 16 cycle latency for Division
-        #     if(self.ExecutionCount == 15) :
-        #         output = ARF.Register[regToRegIndex(currentInstruction.operand2)] / ARF.Register[regToRegIndex(currentInstruction.operand3)]
-        #         self.ExecutionCount = 0     # Re-set execution count
-        #     else :
-        #         error = 2       # Cycle delay occured
-        #         self.ExecutionCount += 1
-        # # DIVI
-        # elif currentInstruction.opCode == "DIVI": 
-        #     # Introduce 16 cycle latency for Division
-        #     if(self.ExecutionCount == 15) :
-        #         output = ARF.Register[regToRegIndex(currentInstruction.operand2)] / int(currentInstruction.operand3)
-        #         self.ExecutionCount = 0     # Re-set execution count
-        #     else :
-        #         error = 2       # Cycle delay occured
-        #         self.ExecutionCount += 1
         # Opcode not recognised
         else: 
-            print("ERROR - Opcode '{}' not recognised. Exiting..." .format(currentInstruction.opCode))
+            print("ERROR - Opcode '{}' not recognised. Exiting..." .format(IS_EX[EUindex].Op))
             error = -1
         return error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output
 
@@ -128,41 +76,24 @@ class LDSTR_Execution_Unit :
     def executeInstruction(self, IS_EX, EUindex, ARF, MEM, PC, finished, branchExecutedCount, branchTakenCount) :
         output = None
         error = 0
-        currentInstruction = IS_EX.Instruction[EUindex]
-        # Invalid due to branch mispredict
-        if currentInstruction.Valid == False :
-            return error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output
-        
+
         # Introduce 2 cycle latency for Load and Stores (Replicating L1 cache latency)
         if(self.ExecutionCount == 1) :
             # LD
-            if IS_EX.Op[EUindex] == "LD": 
-                output = MEM[IS_EX.S1[EUindex] + IS_EX.S2[EUindex]]
+            if IS_EX[EUindex].Op == "LD": 
+                output = MEM[IS_EX[EUindex].S1 + IS_EX[EUindex].S2]
             # LDC
-            elif IS_EX.Op[EUindex] == "LDC": 
-                output = MEM[IS_EX.S1[EUindex] + IS_EX.S2[EUindex]]
+            elif IS_EX[EUindex].Op == "LDC": 
+                output = MEM[IS_EX[EUindex].S1 + IS_EX[EUindex].S2]
             # STR
-            elif IS_EX.Op[EUindex] == "STR": 
-                MEM[IS_EX.S1[EUindex] + IS_EX.S2[EUindex]] = IS_EX.D1[EUindex]
+            elif IS_EX[EUindex].Op == "STR": 
+                MEM[IS_EX[EUindex].S1 + IS_EX[EUindex].S2] = IS_EX[EUindex].D1
             # STRC
-            elif IS_EX.Op[EUindex] == "STRC":
-                MEM[IS_EX.S1[EUindex] + IS_EX.S2[EUindex]] = IS_EX.D1[EUindex]
-
-            # # LD
-            # if currentInstruction.opCode == "LD": 
-            #     output = MEM[ARF.Register[regToRegIndex(currentInstruction.operand2)] + ARF.Register[regToRegIndex(currentInstruction.operand3)]]
-            # # LDC
-            # elif currentInstruction.opCode == "LDC": 
-            #     output = MEM[ARF.Register[regToRegIndex(currentInstruction.operand2)] + int(currentInstruction.operand3)]
-            # # STR
-            # elif currentInstruction.opCode == "STR": 
-            #     MEM[ARF.Register[regToRegIndex(currentInstruction.operand2)] + ARF.Register[regToRegIndex(currentInstruction.operand3)]] = ARF.Register[regToRegIndex(currentInstruction.operand1)]
-            # # STRC
-            # elif currentInstruction.opCode == "STRC":
-            #     MEM[ARF.Register[regToRegIndex(currentInstruction.operand2)] + int(currentInstruction.operand3)] = ARF.Register[regToRegIndex(currentInstruction.operand1)]
+            elif IS_EX[EUindex].Op == "STRC":
+                MEM[IS_EX[EUindex].S1 + IS_EX[EUindex].S2] = IS_EX[EUindex].D1
             # Opcode not recognised
             else: 
-                print("ERROR - Opcode '{}' not recognised. Exiting..." .format(currentInstruction.opCode))
+                print("ERROR - Opcode '{}' not recognised. Exiting..." .format(IS_EX[EUindex].Op))
                 error = -1
             self.ExecutionCount = 0     # Re-set execution count
         else :
@@ -179,113 +110,59 @@ class BRLGC_Execution_Unit :
     def executeInstruction(self, IS_EX, EUindex, ARF, MEM, PC, finished, branchExecutedCount, branchTakenCount) :
         output = None
         error = 0
-        currentInstruction = IS_EX.Instruction[EUindex]
-        targetAddress = IS_EX.TargetAddress[EUindex]
-        # Invalid due to branch mispredict
-        if currentInstruction.Valid == False :
-            return error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output
+        targetAddress = IS_EX[EUindex].TargetAddress
 
         # HALT
-        if IS_EX.Op[EUindex] == "HALT":                                                     
+        if IS_EX[EUindex].Op == "HALT":                                                     
             finished = True
         # CMP
-        elif IS_EX.Op[EUindex] == "CMP": 
-            if(IS_EX.S1[EUindex] > IS_EX.S2[EUindex]) :
+        elif IS_EX[EUindex].Op == "CMP": 
+            if(IS_EX[EUindex].S1 > IS_EX[EUindex].S2) :
                 output = 1
-            elif(IS_EX.S1[EUindex] == IS_EX.S2[EUindex]) :
+            elif(IS_EX[EUindex].S1 == IS_EX[EUindex].S2) :
                 output = 0
-            elif(IS_EX.S1[EUindex] < IS_EX.S2[EUindex]) :
+            elif(IS_EX[EUindex].S1 < IS_EX[EUindex].S2) :
                 output = -1
         # JMP
-        elif IS_EX.Op[EUindex] == "JMP": 
+        elif IS_EX[EUindex].Op == "JMP": 
             branchExecutedCount += 1
             branchTakenCount += 1
-            PC = IS_EX.D1[EUindex]
+            PC = IS_EX[EUindex].D1
             error = 1   # Flush pipeline
         # BR
-        elif IS_EX.Op[EUindex] == "BR": 
+        elif IS_EX[EUindex].Op == "BR": 
             branchExecutedCount += 1
             branchTakenCount += 1
-            PC = IS_EX.D1[EUindex]
+            PC = IS_EX[EUindex].D1
             error = 1   # Flush pipeline
         # BEQ
-        elif IS_EX.Op[EUindex] == "BEQ": 
+        elif IS_EX[EUindex].Op == "BEQ": 
             branchExecutedCount += 1
-            if(IS_EX.D1[EUindex] == IS_EX.S1[EUindex]) :
-                PC = IS_EX.S2[EUindex]
+            if(IS_EX[EUindex].D1 == IS_EX[EUindex].S1) :
+                PC = IS_EX[EUindex].S2
                 branchTakenCount += 1
                 error = 1   # Flush pipeline
         # BLT
-        elif IS_EX.Op[EUindex] == "BLT": 
+        elif IS_EX[EUindex].Op == "BLT": 
             branchExecutedCount += 1
-            if(IS_EX.D1[EUindex] < IS_EX.S1[EUindex]) :
-                PC = IS_EX.S2[EUindex]
+            if(IS_EX[EUindex].D1 < IS_EX[EUindex].S1) :
+                PC = IS_EX[EUindex].S2
                 branchTakenCount += 1
                 error = 1   # Flush pipeline
         #LSL
-        elif IS_EX.Op[EUindex] == "LSL":
-            output = IS_EX.S1[EUindex] << IS_EX.S2[EUindex]
+        elif IS_EX[EUindex].Op == "LSL":
+            output = IS_EX[EUindex].S1 << IS_EX[EUindex].S2
         #LSR
-        elif IS_EX.Op[EUindex] == "LSR":
-            output = IS_EX.S1[EUindex] >> IS_EX.S2[EUindex]
+        elif IS_EX[EUindex].Op == "LSR":
+            output = IS_EX[EUindex].S1 >> IS_EX[EUindex].S2
         #XOR
-        elif IS_EX.Op[EUindex] == "XOR" :
-            output = IS_EX.S1[EUindex] ^ IS_EX.S2[EUindex]
+        elif IS_EX[EUindex].Op == "XOR" :
+            output = IS_EX[EUindex].S1 ^ IS_EX[EUindex].S2
         #AND
-        elif IS_EX.Op[EUindex] == "AND" :
-            output = IS_EX.S1[EUindex] & IS_EX.S2[EUindex]
-
-        # # HALT
-        # if currentInstruction.opCode == "HALT":                                                     
-        #     finished = True
-        # # CMP
-        # elif currentInstruction.opCode == "CMP": 
-        #     if(ARF.Register[regToRegIndex(currentInstruction.operand2)] > ARF.Register[regToRegIndex(currentInstruction.operand3)]) :
-        #         output = 1
-        #     elif(ARF.Register[regToRegIndex(currentInstruction.operand2)] == ARF.Register[regToRegIndex(currentInstruction.operand3)]) :
-        #         output = 0
-        #     elif(ARF.Register[regToRegIndex(currentInstruction.operand2)] < ARF.Register[regToRegIndex(currentInstruction.operand3)]) :
-        #         output = -1
-        # # JMP
-        # elif currentInstruction.opCode == "JMP": 
-        #     branchExecutedCount += 1
-        #     branchTakenCount += 1
-        #     PC = ARF.Register[regToRegIndex(currentInstruction.operand1)]
-        #     error = 1   # Flush pipeline
-        # # BR
-        # elif currentInstruction.opCode == "BR": 
-        #     branchExecutedCount += 1
-        #     branchTakenCount += 1
-        #     PC = int(currentInstruction.operand1)
-        #     error = 1   # Flush pipeline
-        # # BEQ
-        # elif currentInstruction.opCode == "BEQ": 
-        #     branchExecutedCount += 1
-        #     if(ARF.Register[regToRegIndex(currentInstruction.operand1)] == ARF.Register[regToRegIndex(currentInstruction.operand2)]) :
-        #         PC = int(currentInstruction.operand3)
-        #         branchTakenCount += 1
-        #         error = 1   # Flush pipeline
-        # # BLT
-        # elif currentInstruction.opCode == "BLT": 
-        #     branchExecutedCount += 1
-        #     if(ARF.Register[regToRegIndex(currentInstruction.operand1)] < ARF.Register[regToRegIndex(currentInstruction.operand2)]) :
-        #         PC = int(currentInstruction.operand3)
-        #         branchTakenCount += 1
-        #         error = 1   # Flush pipeline
-        # #LSL
-        # elif currentInstruction.opCode == "LSL":
-        #     output = int(ARF.Register[regToRegIndex(currentInstruction.operand2)]) << int(ARF.Register[regToRegIndex(currentInstruction.operand3)])
-        # #LSR
-        # elif currentInstruction.opCode == "LSR":
-        #     output = int(ARF.Register[regToRegIndex(currentInstruction.operand2)]) >> int(ARF.Register[regToRegIndex(currentInstruction.operand3)])
-        # #XOR
-        # elif currentInstruction.opCode == "XOR" :
-        #     output = int(ARF.Register[regToRegIndex(currentInstruction.operand2)]) ^ int(ARF.Register[regToRegIndex(currentInstruction.operand3)])
-        # #AND
-        # elif currentInstruction.opCode == "AND" :
-        #     output = int(ARF.Register[regToRegIndex(currentInstruction.operand2)]) & int(ARF.Register[regToRegIndex(currentInstruction.operand3)])
+        elif IS_EX[EUindex].Op == "AND" :
+            output = IS_EX[EUindex].S1 & IS_EX[EUindex].S2
         # Opcode not recognised
         else: 
-            print("ERROR - Opcode '{}' not recognised. Exiting..." .format(currentInstruction.opCode))
+            print("ERROR - Opcode '{}' not recognised. Exiting..." .format(IS_EX[EUindex].Op))
             error = -1
         return error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output

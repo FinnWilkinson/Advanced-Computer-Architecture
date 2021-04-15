@@ -12,41 +12,49 @@ class ReservationStation :
         self.Instruction = list()
         self.TargetAddress = list()     # Used for branch target address
         self.Op = list()                # Operation used on s1, s2
-        self.D1 = list()                # Destination register OR if read only instruction, value in address ARF[operand1]
-        self.V1 = list()                # 0 if value in S1 is correct, 1 otherwise
-        self.V2 = list()                # 0 if value in S2 is correct, 1 otherwise
+        self.D1 = list()                # Destination ROB address OR if read only instruction, value at address operand1
+        self.V1 = list()                # 0 if value in S1 is correct, otherwise ROB address
+        self.V2 = list()                # 0 if value in S2 is correct, otherwise ROB address
         self.S1 = list()                # Operand 2
         self.S2 = list()                # Operand 3
-
     
-    def flush(self, instructionNumber) :
-        for j in range(0, len(self.Instruction)) :
-            if self.Instruction[j].instructionNumber > instructionNumber :
-                self.Instruction[j].Valid = False
+    def flush(self, instrNumber) :
+        j = len(self.Instruction)
+        for i in range(0, j) :
+            if(self.Instruction[i].instructionNumber > instrNumber) :
+                self.Instruction.pop(i)
+                self.TargetAddress.pop(i)     
+                self.Op.pop(i)                
+                self.D1.pop(i)                
+                self.V1.pop(i)                
+                self.V2.pop(i)                
+                self.S1.pop(i)                
+                self.S2.pop(i)                
+                j -= 1
+                i -= 1
 
 class IS_EX_Reg :
-    # Everything is *4 as 4 EUs
     def __init__(self) :
-        self.Empty = [True] * 4
-        self.Instruction = [Instruction(0,0,0,0,0)] * 4
-        self.TargetAddress = [0] * 4                   # Used for branch target address
-        self.Op = [""] * 4                # Operation used on s1, s2
-        self.D1 = [""] * 4                # Destination address
-        self.S1 = [0] * 4                 # Operand 1
-        self.S2 = [0] * 4                 # Operand 2
+        self.Empty = True
+        self.TargetAddress = 0      # Used for branch target address
+        self.InstructionNumber = 0  # Instruction sequence number of instruction
+        self.Op = ""                # Operation used on s1, s2
+        self.D1 = ""                # Destination address
+        self.S1 = 0                 # Operand 1
+        self.S2 = 0                 # Operand 2
+
 
 class ReOrderBuffer :
-    def __init__(self) :
-        self.Instruction = list()
-        self.Value = list()
-
-class ReOrderBuff :
     def __init__(self) :
         self.Register = [" "] * 128
         self.Value = [0] * 128
         self.Complete = [0] * 128   # 0 = not completed, 1 = completed
         self.CommitPtr = 0          # Points to index to write back to ARF next
         self.IssuePtr = 0           # Points to index to assign instruction to next
+
+    # !! NEED TO IMPLEMENT !!
+    def flush(self, instructionNumber, RAT) :
+        return False
 
 class RegAddrTable :
     def __init__(self) :

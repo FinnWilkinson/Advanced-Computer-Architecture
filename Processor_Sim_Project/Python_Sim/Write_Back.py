@@ -12,15 +12,21 @@ class Write_Back_Unit :
     def writeBack(self, ROB, ARF) :
         if(len(ROB.Instruction) > 0) :
             for i in range(0, len(ROB.Instruction)) :
-                if(ROB.Instruction[i].instructionNumber == self.nextInstruction) :                    
+                print(ROB.Instruction[i].instructionNumber)
+                inNoWriteBackList = False
+                if(ROB.Instruction[i].instructionNumber == self.nextInstruction) :
+                    if(ROB.Instruction[i].opCode in self.noWriteBack) :
+                        inNoWriteBackList = True
                     if(ROB.Instruction[i].Valid != False) :
                         if(ROB.Value[i] != None) :
                             ARF.Register[regToRegIndex(ROB.Instruction[i].operand1)] = copy.copy(ROB.Value[i])
-                    if("r" in str(ROB.Instruction[i].operand1)) :
+                    if("r" in str(ROB.Instruction[i].operand1) and not inNoWriteBackList) :
                         ARF.regInUse[regToRegIndex(ROB.Instruction[i].operand1)] = 0
+                    print("Written Back {}, freed {}" .format(ROB.Instruction[i].instructionNumber, ROB.Instruction[i].operand1))
                     ROB.Instruction.pop(i)
                     ROB.Value.pop(i)
                     self.nextInstruction += 1
-                    break
+                    if(inNoWriteBackList == False) :
+                        break   
 
         return ARF

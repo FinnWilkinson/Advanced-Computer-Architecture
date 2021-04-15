@@ -8,13 +8,16 @@ class Fetch_Unit :
 
     def fetchNext(self, PC, INSTR, IF_DE, instructionFetchCount) :
         nextInstruction = INSTR[PC]
-        # Stops OoO program crashes due to unknown opcode
+
+        # Stops program crashes due to unknown opcode after end of program
         if nextInstruction.opCode == 0 :
             IF_DE.Empty = True
             return PC, instructionFetchCount
+
         nextInstruction.instructionNumber = instructionFetchCount
         nextInstruction.Valid = True
         IF_DE.Instruction = copy.copy(nextInstruction)
+        
         # Branch prediction target address
 
         IF_DE.Empty = False

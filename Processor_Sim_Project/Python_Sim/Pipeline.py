@@ -42,6 +42,7 @@ class Pipeline:
                     error = 0   # Reset error for Main to process correctly
                 if(error != 2) :  # If multi-cycle instruction, delay output
                     self.IS_EX.Empty[i] = True
+                    print("Executed {}" .format(self.IS_EX.Instruction[i].instructionNumber))   
                     self.ROB.Instruction.append(self.IS_EX.Instruction[i])
                     self.ROB.Value.append(output)
                     instructionExecuteCount += 1
@@ -50,19 +51,25 @@ class Pipeline:
                 
             
         # ISSUE (IS) - Proper Dependancy and OoO scheduling
-        tempStallIndicator = self.issueUnit.issueInstruction(self.RS, self.IS_EX, ARF, stallThisCycle)
+        # tempStallIndicator = self.issueUnit.issueInstruction(self.RS, self.IS_EX, ARF)
+        tempStallIndicator = self.issueUnit.issueNext(self.RS, self.IS_EX, ARF,)  
         if tempStallIndicator == True and instructionFetchCount > 2 :
             stallThisCycle = True
-         
+             
 
         # DECODE (DE) - register re-naming, PRF,
         if self.IF_DE.Empty is False :
-            stallThisCycle = self.decodeUnit.decodeInstruction(self.IF_DE, self.RS, ARF, stallThisCycle)         
+            # stallThisCycle = self.decodeUnit.decodeInstruction(self.IF_DE, self.RS, ARF) 
+            stallThisCycle = self.decodeUnit.decodeNext(self.IF_DE, self.RS, ARF) 
+            print("Decoded {}" .format(self.IF_DE.Instruction.instructionNumber))       
                     
 
         # INSTRUCTION FETCH (IF) - DONE
         if self.IF_DE.Empty is True and PC < len(INSTR):
             PC, instructionFetchCount = self.fetchUnit.fetchNext(PC, INSTR, self.IF_DE, instructionFetchCount)
+            print("Fetched {}" .format(instructionFetchCount - 1))
+        elif self.IF_DE.Empty is False :
+            stallThisCycle = True
 
 
         # Increase stall count if stall in pipeline

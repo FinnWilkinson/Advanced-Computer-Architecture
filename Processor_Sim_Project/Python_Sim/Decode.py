@@ -48,13 +48,14 @@ class Decode_Unit :
 
         # Assign place in ROB
         ROBindex = copy.copy(ROB.IssuePtr)
-        ROB.IssuePtr = (ROB.IssuePtr + 1) % 128                                 # mod 128 so tat index loops around
+        ROB.IssuePtr = copy.copy((ROB.IssuePtr + 1) % 128)                                # mod 128 so tat index loops around
         # If read only, change ROB register value assigning
         if(nextInstruction.opCode in self.readOnlyINSTR) :
             ROB.Register[ROBindex] = "SKIP"                                     # SKIP as we dont need to write back value
             ROB.Complete[ROBindex] = 1                                          # Completed as nothing to write back or read from
         else :  
             ROB.Register[ROBindex] = copy.copy(nextInstruction.operand1)        # Input actual register to write to
+            ROB.Complete[ROBindex] = 0
             
 
         # Read available values via RAT address & assign
@@ -68,7 +69,7 @@ class Decode_Unit :
             if("r" in str(nextInstruction.operand1)) :
                 if("ROB" in str(RAT.Address[int(nextInstruction.operand1[1:])])) :
                     # Register has been renamed
-                    tempRobAddr = int(RAT.Address[int(nextInstruction.operand1[1:])][3:])
+                    tempRobAddr = copy.copy(int(RAT.Address[int(nextInstruction.operand1[1:])][3:]))
                     if(ROB.Complete[tempRobAddr] == 1) :
                         # Value ready to be read
                         d1 = copy.copy(ROB.Value[tempRobAddr])
@@ -80,7 +81,7 @@ class Decode_Unit :
                     d1 = copy.copy(ARF.Register[int(nextInstruction.operand1[1:])])
             elif(nextInstruction.operand1 != ''):
                 # If operand 1 is a constant, get value
-                d1 = int(nextInstruction.operand1)
+                d1 = copy.copy(int(nextInstruction.operand1))
 
         # Get s1 value (operand 2) if available
         if("r" in str(nextInstruction.operand2)) :
@@ -129,7 +130,6 @@ class Decode_Unit :
         if(nextInstruction.opCode not in self.readOnlyINSTR) :
             RAT.Address[int(nextInstruction.operand1[1:])] = copy.copy("ROB" + str(ROBindex))        # Update most recent physical address in RAT
             d1 = copy.copy("ROB" + str(ROBindex))
-
 
         # Add to correct RS
         RS[resID].Instruction.append(copy.copy(nextInstruction))

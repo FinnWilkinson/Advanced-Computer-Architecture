@@ -14,7 +14,7 @@ class Fetch_Unit :
             IF_DE.Empty = True
             return PC, instructionFetchCount
 
-        nextInstruction.instructionNumber = instructionFetchCount
+        nextInstruction.instructionNumber = copy.copy(instructionFetchCount)
         nextInstruction.Valid = True
         IF_DE.Instruction = copy.copy(nextInstruction)
 

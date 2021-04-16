@@ -17,21 +17,7 @@ class ReservationStation :
         self.V2 = list()                # 0 if value in S2 is correct, otherwise ROB address
         self.S1 = list()                # Operand 2
         self.S2 = list()                # Operand 3
-    
-    def flush(self, instrNumber) :
-        j = len(self.Instruction)
-        for i in range(0, j) :
-            if(self.Instruction[i].instructionNumber > instrNumber) :
-                self.Instruction.pop(i)
-                self.TargetAddress.pop(i)     
-                self.Op.pop(i)                
-                self.D1.pop(i)                
-                self.V1.pop(i)                
-                self.V2.pop(i)                
-                self.S1.pop(i)                
-                self.S2.pop(i)                
-                j -= 1
-                i -= 1
+
 
 class IS_EX_Reg :
     def __init__(self) :

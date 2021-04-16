@@ -9,7 +9,7 @@ def printSysInfo(ARF, MEM, INSTR, PC, cycles, instructionFetchCount, instruction
     tempMEM = np.reshape(MEM, (-1, 32))
     #os.system('cls||clear')
 
-    print("│ PC = {} │ Cycles = {} │ Instructions Fetched = {} │ Instructions Executed = {} | Instructions Executed This Cycle = {} | Average ILP = {} |" .format(PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP))
+    print("│ PC = {} │ Cycles = {} │ Instructions Fetched = {} │ Instructions Executed = {} | Instructions Executed This Cycle = {} | Average IPC = {} |" .format(PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP))
     print("| Branches Executed = {} | Branches Taken = {} | Correct Branch Predictions = {} | Cycles Stalled = {} | Flushes = {} |" .format(branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount))
     print()
     print("Architectural Register File :")

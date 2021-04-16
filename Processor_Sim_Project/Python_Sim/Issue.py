@@ -21,20 +21,21 @@ class Issue_Unit :
         # Arithmetic RS
         if(len(RS[0].Instruction) > 0) :
             # Check EU ready to recieve next instruction
-            if(IS_EX[0].Empty == True or IS_EX[0].Empty == True) :
+            if(IS_EX[0].Empty == True or IS_EX[1].Empty == True) :
                 for i in range(0, len(RS[0].Instruction)) :
                     # Try get all values, if cant then go to next instruction in queue
 
-                    # Check if read-only instruction, and get value of operand1 if needed
-                    if(RS[0].Op[i] in self.readOnlyINSTR) :
-                        if("ROB" in str(RS[0].D1[i])) :
-                            tempROBaddr = int(RS[0].D1[i][3:])
-                            if(ROB.Complete[tempROBaddr] == 1) :
-                                # Value ready to be read
-                                RS[0].D1[i] = copy.copy(ROB.Value[tempROBaddr])
-                            else :
-                                # Value not ready, continue to next in list
-                                continue
+                    # Check Valid, if not remove
+                    if(RS[0].Instruction[i].Valid == False) :
+                        RS[0].Instruction.pop(i)
+                        RS[0].TargetAddress.pop(i)
+                        RS[0].Op.pop(i)
+                        RS[0].D1.pop(i)
+                        RS[0].V1.pop(i)
+                        RS[0].V2.pop(i)
+                        RS[0].S1.pop(i)
+                        RS[0].S2.pop(i)
+                        break
 
                     # Get value of operand2 if needed
                     if(RS[0].V1[i] != 0) :
@@ -114,6 +115,18 @@ class Issue_Unit :
                 for i in range(0, len(RS[1].Instruction)) :
                     # Try get all values, if cant then go to next instruction in queue
 
+                    # Check Valid, if not remove
+                    if(RS[1].Instruction[i].Valid == False) :
+                        RS[1].Instruction.pop(i)
+                        RS[1].TargetAddress.pop(i)
+                        RS[1].Op.pop(i)
+                        RS[1].D1.pop(i)
+                        RS[1].V1.pop(i)
+                        RS[1].V2.pop(i)
+                        RS[1].S1.pop(i)
+                        RS[1].S2.pop(i)
+                        break
+
                     # Check if read-only instruction, and get value of operand1 if needed
                     if(RS[1].Op[i] in self.readOnlyINSTR) :
                         if("ROB" in str(RS[1].D1[i])) :
@@ -192,6 +205,18 @@ class Issue_Unit :
             # Check EU ready to recieve next instruction
             if(IS_EX[3].Empty == True) :
                 for i in range(0, len(RS[2].Instruction)) :
+                    # Check Valid, if not remove
+                    if(RS[2].Instruction[i].Valid == False) :
+                        RS[2].Instruction.pop(i)
+                        RS[2].TargetAddress.pop(i)
+                        RS[2].Op.pop(i)
+                        RS[2].D1.pop(i)
+                        RS[2].V1.pop(i)
+                        RS[2].V2.pop(i)
+                        RS[2].S1.pop(i)
+                        RS[2].S2.pop(i)
+                        break
+
                     # Check for HALT
                     if(RS[2].Op[i] == "HALT") :
                         if(len(RS[0].Op) != 0 or len(RS[1].Op) != 0) :
@@ -243,6 +268,16 @@ class Issue_Unit :
                             break
                     if(preceedingBranch == True) :
                         break
+
+                    # IF branch, make sure all done before it
+                    oldestINSTR = True
+                    for t in range(0,1) :
+                        for h in range(0, len(RS[t].Instruction)) :
+                            if(RS[t].Instruction[h].instructionNumber < RS[2].Instruction[i].instructionNumber) :
+                                oldestINSTR = False
+                    if(oldestINSTR == False) :
+                        continue
+                    
 
                     # Issue to EU
                     IS_EX[3].TargetAddress = copy.copy(RS[2].TargetAddress[i])

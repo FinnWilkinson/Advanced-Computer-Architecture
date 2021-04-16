@@ -17,7 +17,22 @@ class Write_Back_Unit :
 
         if(ROB.Complete[ROB.CommitPtr] == 1) :
             ARF.Register[int(ROB.Register[ROB.CommitPtr][1:])] = copy.copy(ROB.Value[ROB.CommitPtr])
+            self.cleanUp(ROB, RAT, ROB.Register[ROB.CommitPtr]) 
             ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 128)
-            
 
         return 
+
+    # If last in ROB to write to register, Set RAT address to be "rx"
+    def cleanUp(self, ROB, RAT, reg) :
+        # Look between CommitPtr and IssuePtr for any other use of reg, if none then reset RAT address
+        index = copy.copy(ROB.CommitPtr)
+        regCount = 0
+        while True :
+            if(ROB.Register[index] == reg) :
+                regCount += 1
+            if(index == ROB.IssuePtr) :
+                break
+            index = copy.copy((index + 1) % 128)
+
+        if(regCount == 1) :
+            RAT.Address[int(reg[1:])] = reg

@@ -52,7 +52,7 @@ if __name__=="__main__" :
 
         if(len(sys.argv) > 2 and sys.argv[2] == "--verbose") :
             # Print initial system information at users discretion
-            printSysInfo(ARF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)
+            printSysInfo(ARF, MEM, INSTR, RAT, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)
         
 
         # If instruction not recognised, quit
@@ -60,4 +60,4 @@ if __name__=="__main__" :
             sys.exit(1)
 
     # Print final system information
-    printSysInfo(ARF, MEM, INSTR, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)
+    printSysInfo(ARF, MEM, INSTR, RAT, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)

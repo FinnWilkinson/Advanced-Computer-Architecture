@@ -63,12 +63,12 @@ class Pipeline:
         # ISSUE (IS) - DONE
         tempStallIndicator = self.issueUnit.issue(self.RS, self.IS_EX, ARF, ROB)  
         if tempStallIndicator == True and instructionFetchCount > 2 :
-            stallThisCycle = copy.copy(stallThisCycle or True)
+            stallThisCycle = True
 
 
         # DECODE (DE) - DONE
         if self.IF_DE.Empty is False :
-            stallThisCycle = copy.copy(stallThisCycle or self.decodeUnit.decode(self.IF_DE, self.RS, ARF, RAT, ROB))      
+            stallThisCycle = self.decodeUnit.decode(self.IF_DE, self.RS, ARF, RAT, ROB)      
                     
         #print("IF " + str(self.IF_DE.Instruction.instructionNumber) + "  " + str(self.IF_DE.Instruction.opCode) + "  " + str(self.IF_DE.Instruction.operand1) + "  " + str(self.IF_DE.Instruction.operand2) + "  " + str(self.IF_DE.Instruction.operand3))
 
@@ -76,7 +76,7 @@ class Pipeline:
         if self.IF_DE.Empty is True and PC < len(INSTR):
             PC, instructionFetchCount = self.fetchUnit.fetchNext(PC, INSTR, self.IF_DE, instructionFetchCount)
         elif self.IF_DE.Empty is False :
-            stallThisCycle = copy.copy(stallThisCycle or True)
+            stallThisCycle = True
 
 
         # Increase stall count if stall in pipeline

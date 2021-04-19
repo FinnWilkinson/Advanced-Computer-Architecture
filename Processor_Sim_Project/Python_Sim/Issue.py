@@ -12,16 +12,16 @@ class Issue_Unit :
 
     def issue(self, RS, IS_EX, ARF, ROB) :
         stallThisCycle = False
-        EUsFull = 0
+        instructionsIssued = 0
 
         # Only issue instructions that have all operands Valid
         # In each RS, issue oldest (lowest INSTR number) instruction that has all values + no True dependancies with instructions ahead of it in queue
         # List will be sorted by default from oldest to youngest
 
-        # Arithmetic 0 RS
+        # Arithmetic RS
         if(len(RS[0].Instruction) > 0) :
             # Check EU ready to recieve next instruction
-            if(IS_EX[0].Empty == True) :
+            if(IS_EX[0].Empty == True or IS_EX[1].Empty == True) :
                 for i in range(0, len(RS[0].Instruction)) :
                     # Try get all values, if cant then go to next instruction in queue
 
@@ -67,17 +67,25 @@ class Issue_Unit :
                         else :
                             break
                     if(preceedingBranch == True) :
-                        stallThisCycle = True       # Stall as waiting for branch
                         break
 
                     # Issue to EU
-                    IS_EX[0].TargetAddress = copy.copy(RS[0].TargetAddress[i])
-                    IS_EX[0].InstructionNumber = copy.copy(RS[0].Instruction[i].instructionNumber)
-                    IS_EX[0].Op = copy.copy(RS[0].Op[i])
-                    IS_EX[0].D1 = copy.copy(RS[0].D1[i])
-                    IS_EX[0].S1 = copy.copy(RS[0].S1[i])
-                    IS_EX[0].S2 = copy.copy(RS[0].S2[i])
-                    IS_EX[0].Empty = False
+                    if(IS_EX[0].Empty == True) :
+                        IS_EX[0].TargetAddress = copy.copy(RS[0].TargetAddress[i])
+                        IS_EX[0].InstructionNumber = copy.copy(RS[0].Instruction[i].instructionNumber)
+                        IS_EX[0].Op = copy.copy(RS[0].Op[i])
+                        IS_EX[0].D1 = copy.copy(RS[0].D1[i])
+                        IS_EX[0].S1 = copy.copy(RS[0].S1[i])
+                        IS_EX[0].S2 = copy.copy(RS[0].S2[i])
+                        IS_EX[0].Empty = False
+                    else :
+                        IS_EX[1].TargetAddress = copy.copy(RS[0].TargetAddress[i])
+                        IS_EX[1].InstructionNumber = copy.copy(RS[0].Instruction[i].instructionNumber)
+                        IS_EX[1].Op = copy.copy(RS[0].Op[i])
+                        IS_EX[1].D1 = copy.copy(RS[0].D1[i])
+                        IS_EX[1].S1 = copy.copy(RS[0].S1[i])
+                        IS_EX[1].S2 = copy.copy(RS[0].S2[i])
+                        IS_EX[1].Empty = False
                     
                     # Remove from RS
                     RS[0].Instruction.pop(i)
@@ -89,88 +97,14 @@ class Issue_Unit :
                     RS[0].S1.pop(i)
                     RS[0].S2.pop(i)
 
+                    instructionsIssued += 1
                     break
             else :
-                # EU busy, so stall
-                stallThisCycle = True               
-
-#########################################################################################################################
-
-        # Arithmetic 1 RS
-        if(len(RS[0].Instruction) > 0) :
-            # Check EU ready to recieve next instruction
-            if(IS_EX[1].Empty == True) :
-                for i in range(0, len(RS[0].Instruction)) :
-                    # Try get all values, if cant then go to next instruction in queue
-
-                    # Check Valid, if not remove
-                    if(RS[0].Instruction[i].Valid == False) :
-                        RS[0].Instruction.pop(i)
-                        RS[0].TargetAddress.pop(i)
-                        RS[0].Op.pop(i)
-                        RS[0].D1.pop(i)
-                        RS[0].V1.pop(i)
-                        RS[0].V2.pop(i)
-                        RS[0].S1.pop(i)
-                        RS[0].S2.pop(i)
-                        break
-
-                    # Get value of operand2 if needed
-                    if(RS[0].V1[i] != 0) :
-                        tempROBaddr = int(RS[0].V1[i][3:])
-                        if(ROB.Complete[tempROBaddr] == 1) :
-                            # Value ready to be read
-                            RS[0].S1[i] = copy.copy(ROB.Value[tempROBaddr])
-                        else :
-                            # Value not ready, continue to next in list
-                            continue
-
-                    # Get value of operand3 if needed
-                    if(RS[0].V2[i] != 0) :
-                        tempROBaddr = int(RS[0].V2[i][3:])
-                        if(ROB.Complete[tempROBaddr] == 1) :
-                            # Value ready to be read
-                            RS[0].S2[i] = copy.copy(ROB.Value[tempROBaddr])
-                        else :
-                            # Value not ready, continue to next in list
-                            continue
-
-                    # If no branch that preceeds it, Issue          !! EDIT OUT WITH BRANCH PREDICTION !!
-                    preceedingBranch = False
-                    for j in range(0, len(RS[2].Instruction)) :
-                        if(RS[2].Instruction[j].instructionNumber < RS[0].Instruction[i].instructionNumber) :
-                            if(RS[2].Op[j] in self.branchInstructions) :
-                                preceedingBranch = True
-                                break
-                        else :
-                            break
-                    if(preceedingBranch == True) :
-                        stallThisCycle = True       # Stall as waiting for branch
-                        break
-
-                    # Issue to EU
-                    IS_EX[1].TargetAddress = copy.copy(RS[0].TargetAddress[i])
-                    IS_EX[1].InstructionNumber = copy.copy(RS[0].Instruction[i].instructionNumber)
-                    IS_EX[1].Op = copy.copy(RS[0].Op[i])
-                    IS_EX[1].D1 = copy.copy(RS[0].D1[i])
-                    IS_EX[1].S1 = copy.copy(RS[0].S1[i])
-                    IS_EX[1].S2 = copy.copy(RS[0].S2[i])
-                    IS_EX[1].Empty = False
-                    
-                    # Remove from RS
-                    RS[0].Instruction.pop(i)
-                    RS[0].TargetAddress.pop(i)
-                    RS[0].Op.pop(i)
-                    RS[0].D1.pop(i)
-                    RS[0].V1.pop(i)
-                    RS[0].V2.pop(i)
-                    RS[0].S1.pop(i)
-                    RS[0].S2.pop(i)
-
-                    break
-            else :
-                # EU busy, so stall
-                stallThisCycle = True                      
+                # If no EU free, stall
+                stallThisCycle = True                   
+        else :
+            # If reservation station full, stall
+            stallThisCycle = True
 
 ############################################################################################
 
@@ -234,7 +168,6 @@ class Issue_Unit :
                         else :
                             break
                     if(preceedingBranch == True) :
-                        stallThisCycle = True       # Stall as waiting for branch
                         break
 
                     # Issue to EU
@@ -256,10 +189,14 @@ class Issue_Unit :
                     RS[1].S1.pop(i)
                     RS[1].S2.pop(i)
 
+                    instructionsIssued += 1
                     break
             else :
-                # EU busy, so stall
-                stallThisCycle = True                  
+                # If no EU free, stall
+                stallThisCycle = True                   
+        else :
+            # If reservation station full, stall
+            stallThisCycle = True
 
 ##########################################################################################
 
@@ -330,7 +267,6 @@ class Issue_Unit :
                         else :
                             break
                     if(preceedingBranch == True) :
-                        stallThisCycle = True       # Stall as waiting for branch
                         break
 
                     # IF branch, make sure all done before it
@@ -362,13 +298,18 @@ class Issue_Unit :
                     RS[2].S1.pop(i)
                     RS[2].S2.pop(i)
 
+                    instructionsIssued += 1
                     break
             else :
-                # EU busy, so stall
-                stallThisCycle = True              
-
+                # If no EU free, stall
+                stallThisCycle = True                   
+        else :
+            # If reservation station full, stall
+            stallThisCycle = True
         
 ##########################################################################################
 
-        
+        if(instructionsIssued != 3) :
+            stallThisCycle = True
+
         return stallThisCycle

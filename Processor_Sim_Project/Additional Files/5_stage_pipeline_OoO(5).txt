@@ -1,6 +1,6 @@
 Factorial (looped 100 times - excluding memory initialisation):
 │ PC = 15 │ Cycles = 8306 │ Instructions Fetched = 6805 │ Instructions Executed = 5505 | Instructions Executed This Cycle = 1 | Average IPC = 0.66 |
-| Branches Executed = 2600 | Branches Taken = 1399 | Correct Branch Predictions = 0 | Cycles Stalled = 1401 | Flushes = 1399 |
+| Branches Executed = 2600 | Branches Taken = 1399 | Correct Branch Predictions = 0 | Cycles Stalled = 100 | Flushes = 1399 |
 
 Register Address Table :
 ────────────────────────
@@ -26,7 +26,7 @@ Main Memory - 1024 represented as 32x32 (Indecies 0 to 31 are top row):
 
 Quick Sort (looped 100 times - excluding memory initialisation):
 │ PC = 142 │ Cycles = 672800 │ Instructions Fetched = 577472 │ Instructions Executed = 436176 | Instructions Executed This Cycle = 1 | Average IPC = 0.65 |
-| Branches Executed = 106850 | Branches Taken = 95226 | Correct Branch Predictions = 0 | Cycles Stalled = 95228 | Flushes = 95226 |
+| Branches Executed = 106850 | Branches Taken = 95226 | Correct Branch Predictions = 0 | Cycles Stalled = 118168 | Flushes = 95226 |
 
 Register Address Table :
 ────────────────────────
@@ -55,21 +55,21 @@ Main Memory - 1024 represented as 32x32 (Indecies 0 to 31 are top row):
 
 
 Vector Addition (looped 100 times - excluding memory initialisation):
-│ PC = 53 │ Cycles = 9444 │ Instructions Fetched = 8243 │ Instructions Executed = 6443 | Instructions Executed This Cycle = 1 | Average IPC = 0.68 |
-| Branches Executed = 1100 | Branches Taken = 999 | Correct Branch Predictions = 0 | Cycles Stalled = 1101 | Flushes = 999 |
+│ PC = 53 │ Cycles = 8444 │ Instructions Fetched = 7343 │ Instructions Executed = 6443 | Instructions Executed This Cycle = 1 | Average IPC = 0.76 |
+| Branches Executed = 1100 | Branches Taken = 999 | Correct Branch Predictions = 0 | Cycles Stalled = 2000 | Flushes = 999 |
 
 Register Address Table :
 ────────────────────────
-│ r0 = r0 │ r1 = ROB17 │ r2 = r2 │ r3 = r3 │ r4 = ROB14 │ r5 = ROB15 │ r6 =r6 │ r7 = r7 │
+│ r0 = r0 │ r1 = ROB13 │ r2 = r2 │ r3 = r3 │ r4 = ROB10 │ r5 = ROB11 │ r6 =r6 │ r7 = r7 │
 │ r8 = r8 │ r9 = r9 │ r10 = r10 │ r11 = r11 │ r12 = r12 │ r13 = r13 │ r14 =r14 │ r15 = r15 │
-│ r16 = r16 │ r17 = r17 │ r18 = r18 │ r19 = r19 │ r20 = r20 │ r21 = r21 │ r22 =r22 │ r23 = r23 │
+│ r16 = r16 │ r17 = r17 │ r18 = r18 │ r19 = r19 │ r20 = r20 │ r21 = r21 │ r22 =ROB15 │ r23 = r23 │
 │ r24 = r24 │ r25 = r25 │ r26 = r26 │ r27 = r27 │ r28 = r28 │ r29 = r29 │ r30 =r30 │ r31 = r31 │
 
 Architectural Register File :
 ─────────────────────────────
 │ r0 = 0 │ r1 = 10 │ r2 = 10 │ r3 = 321 │ r4 = 3 │ r5 = 324 │ r6 =0 │ r7 = 0 │
 │ r8 = 0 │ r9 = 0 │ r10 = 0 │ r11 = 0 │ r12 = 0 │ r13 = 0 │ r14 =0 │ r15 = 0 │
-│ r16 = 0 │ r17 = 0 │ r18 = 0 │ r19 = 0 │ r20 = 0 │ r21 = 0 │ r22 =100 │ r23 = 100 │
+│ r16 = 0 │ r17 = 0 │ r18 = 0 │ r19 = 0 │ r20 = 0 │ r21 = 0 │ r22 =99 │ r23 = 100 │
 │ r24 = 0 │ r25 = 0 │ r26 = 0 │ r27 = 0 │ r28 = 0 │ r29 = 0 │ r30 =0 │ r31 = 0 │
 
 Main Memory - 1024 represented as 32x32 (Indecies 0 to 31 are top row):
@@ -80,15 +80,15 @@ Main Memory - 1024 represented as 32x32 (Indecies 0 to 31 are top row):
 
 
 Matrix Multiplication (looped 100 times - excluding memory initialisation):
-│ PC = 211 │ Cycles = 78252 │ Instructions Fetched = 74451 │ Instructions Executed = 66451 | Instructions Executed This Cycle = 1 | Average IPC = 0.85 |
-| Branches Executed = 4200 | Branches Taken = 3699 | Correct Branch Predictions = 0 | Cycles Stalled = 3701 | Flushes = 3699 |
+│ PC = 211 │ Cycles = 73852 │ Instructions Fetched = 70051 │ Instructions Executed = 66451 | Instructions Executed This Cycle = 1 | Average IPC = 0.9 |
+| Branches Executed = 4200 | Branches Taken = 3699 | Correct Branch Predictions = 0 | Cycles Stalled = 27600 | Flushes = 3699 |
 
 Register Address Table :
 ────────────────────────
 │ r0 = r0 │ r1 = r1 │ r2 = r2 │ r3 = r3 │ r4 = r4 │ r5 = r5 │ r6 =r6 │ r7 = r7 │
 │ r8 = r8 │ r9 = r9 │ r10 = r10 │ r11 = r11 │ r12 = r12 │ r13 = r13 │ r14 =r14 │ r15 = r15 │
-│ r16 = r16 │ r17 = r17 │ r18 = r18 │ r19 = r19 │ r20 = r20 │ r21 = r21 │ r22 =r22 │ r23 = r23 │
-│ r24 = r24 │ r25 = r25 │ r26 = r26 │ r27 = r27 │ r28 = r28 │ r29 = r29 │ r30 =ROB51 │ r31 = r31 │
+│ r16 = r16 │ r17 = r17 │ r18 = r18 │ r19 = r19 │ r20 = r20 │ r21 = ROB111 │ r22 =r22 │ r23 = r23 │
+│ r24 = r24 │ r25 = r25 │ r26 = ROB121 │ r27 = r27 │ r28 = r28 │ r29 = r29 │ r30 =ROB3 │ r31 = r31 │
 
 Architectural Register File :
 ─────────────────────────────

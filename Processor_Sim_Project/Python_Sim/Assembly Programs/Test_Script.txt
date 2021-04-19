@@ -1,0 +1,32 @@
+// This program used each instruction once to ensure that they work correctly. (Except branch instructions)
+// Successful completion should have the following values on output :
+
+// r1 = 5, r2 = 10, r3 = 5, r4 = 6, r5 = 30, r6 = 12, r7 = 2, r8 = 1
+// r9 = 30, r10 = 12, r11 = -1, r12 = 0, r13 = 48, r14 = 3, r15 = 60, r16 = 28
+
+// MEM[0] = 12
+// MEM[1] = 30
+
+ADDI r1, r0, 5
+ADD r2, r1, r1
+SUB r3, r2, r1
+SUBI r4, r2, 4
+MUL r5, r1, r4
+MULI r6, r4, 2
+DIV r7, r6, r4
+DIVI r8, r7, 2
+
+STR r6, r0, r0
+STRC r5, r0, 1
+LD r9, r0, r8
+LDC r10, r0, 0
+
+CMP r11, r3, r5
+CMP r12, r1, r3
+
+LSL r13, r6, 2
+LSR r14, r5, 3
+XOR r15, r10, r13
+AND r16, r15, r5
+
+HALT

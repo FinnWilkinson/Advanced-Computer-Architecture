@@ -287,6 +287,8 @@ class Issue_Unit :
                             continue
                         if(IS_EX[0].Empty == False or IS_EX[1].Empty == False or IS_EX[2].Empty == False or IS_EX[3].Empty == False) :
                             continue
+                        if(ROB.CommitPtr != ROB.IssuePtr) :
+                            continue
 
                     # Try get all values, if cant then go to next instruction in queue
 

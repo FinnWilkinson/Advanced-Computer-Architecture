@@ -46,7 +46,7 @@ class ARITH_Execution_Unit :
         elif IS_EX[EUindex].Op == "DIV": 
             # Introduce 16 cycle latency for Division
             if(self.ExecutionCount == 15) :
-                output = IS_EX[EUindex].S1 / IS_EX[EUindex].S2
+                output = int(IS_EX[EUindex].S1 / IS_EX[EUindex].S2)
                 self.ExecutionCount = 0     # Re-set execution count
             else :
                 error = 2       # Cycle delay occured
@@ -55,7 +55,7 @@ class ARITH_Execution_Unit :
         elif IS_EX[EUindex].Op == "DIVI": 
             # Introduce 16 cycle latency for Division
             if(self.ExecutionCount == 15) :
-                output = IS_EX[EUindex].S1 / IS_EX[EUindex].S2
+                output = int(IS_EX[EUindex].S1 / IS_EX[EUindex].S2)
                 self.ExecutionCount = 0     # Re-set execution count
             else :
                 error = 2       # Cycle delay occured

@@ -12,7 +12,7 @@ class Decode_Unit :
     def __init__(self) :
         self.branchInstructions = ["JMP", "BR", "BEQ", "BLT"]
         self.loadStoreInstructions = ["LD", "LDC", "STR", "STRC"]
-        self.logicInstructions = ["HALT", "LSL", "LSR", "AND", "XOR"]
+        self.logicInstructions = ["HALT", "LSL", "LSR", "AND", "XOR", "CMP"]
         self.readOnlyINSTR = ["STR", "STRC", "JMP", "BR", "BEQ", "BLT", "HALT"]
 
     def decode(self, IF_DE, RS, ARF, RAT, ROB) :

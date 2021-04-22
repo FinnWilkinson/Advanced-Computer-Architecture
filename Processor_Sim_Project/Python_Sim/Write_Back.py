@@ -1,6 +1,5 @@
 from Instruction import Instruction
 from Register_File import *
-from Reg_To_Reg_Index import *
 import copy as copy
 
 class Write_Back_Unit :
@@ -9,7 +8,12 @@ class Write_Back_Unit :
         self.noWriteBack = ["STR", "STRC", "JMP", "BR", "BLT", "BEQ"]
         return
 
-    def writeBack(self, ROB, RAT, ARF) :
+    def writeBack(self, ROB, RAT, ARF, BIPB) :
+        # If branch in BIPB that is less than next to commit, wait for it to execute
+        for i in range(0, len(BIPB.BranchPC)) :
+            if(ROB.InstructionNumber[ROB.CommitPtr] == BIPB.InstructionNumber[i]) :
+                return
+
         # If read only instruction in place, move to next item in ROB
         if(ROB.Register[ROB.CommitPtr] == "SKIP") :
             ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 128)

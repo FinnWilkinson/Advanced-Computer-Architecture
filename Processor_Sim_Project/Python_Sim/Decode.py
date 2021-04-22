@@ -1,5 +1,5 @@
 from Instruction import Instruction
-from Reg_To_Reg_Index import *
+from Branch_Prediction import *
 import copy as copy
 
 # Instructions:
@@ -15,12 +15,43 @@ class Decode_Unit :
         self.logicInstructions = ["HALT", "LSL", "LSR", "AND", "XOR", "CMP"]
         self.readOnlyINSTR = ["STR", "STRC", "JMP", "BR", "BEQ", "BLT", "HALT"]
 
-    def decode(self, IF_DE, RS, ARF, RAT, ROB) :
+    def decode(self, IF_DE, RS, ARF, RAT, ROB, BIPB, BTB, PC, branchPredType) :
         stallThisCycle = False
         
         # Get instruction from IF_DE
         nextInstruction = copy.copy(IF_DE.Instruction)
+
+        if(branchPredType != 0) :
+            # Branch Prediction
+            if(nextInstruction.opCode in self.branchInstructions) :
+                if(nextInstruction.instructionNumber not in BIPB.InstructionNumber) :
+                    # Branch not executed before so not in BTB
+                    BIPB.BranchPC.append(copy.copy(IF_DE.InstructionPC))
+                    BIPB.InstructionNumber.append(copy.copy(nextInstruction.instructionNumber))
+                    # Not in BTB so will default to Fixed prediction (Taken) (set branchPredType = -1 so function defaults)
+                    BIPB.Prediction.append(copy.copy(getBranchPred(-1, BTB, 1)))
+
+                    # Add Branch to BTB
+                    BTB.BranchPC.append(copy.copy(IF_DE.InstructionPC))
+                    if(nextInstruction.opCode == "BR" or nextInstruction.opCode == "JMP") :
+                        BTB.LastResult.append((True, True))
+                    else :
+                        BTB.LastResult.append((True, None))
+
+                    if(nextInstruction.opCode == "BR") :
+                        BTB.TargetAddress.append(copy.copy(int(nextInstruction.operand1)))
+                        # Update PC to target address
+                        PC = copy.copy(int(nextInstruction.operand1))
+                    elif(nextInstruction.opCode == "BEQ" or nextInstruction.opCode == "BLT") :
+                        BTB.TargetAddress.append(copy.copy(int(nextInstruction.operand3)))
+                        # Update PC to target address
+                        PC = copy.copy(int(nextInstruction.operand3))
+                    else :
+                        # Need to update in Execute after register is read and address known
+                        BTB.TargetAddress.append(-1)
+                
         
+
         # Get Reservation station ID
         resID = 0
         # Branch or Logic
@@ -56,6 +87,7 @@ class Decode_Unit :
         else :  
             ROB.Register[ROBindex] = copy.copy(nextInstruction.operand1)        # Input actual register to write to
             ROB.Complete[ROBindex] = 0
+            ROB.InstructionNumber[ROBindex] = copy.copy(nextInstruction.instructionNumber)
             
 
         # Read available values via RAT address & assign
@@ -133,15 +165,16 @@ class Decode_Unit :
 
         # Add to correct RS
         RS[resID].Instruction.append(copy.copy(nextInstruction))
-        RS[resID].TargetAddress.append(copy.copy(IF_DE.TargetAddress))
         RS[resID].Op.append(copy.copy(nextInstruction.opCode))
         RS[resID].D1.append(copy.copy(d1))
         RS[resID].V1.append(copy.copy(v1))
         RS[resID].V2.append(copy.copy(v2))
         RS[resID].S1.append(copy.copy(s1))
         RS[resID].S2.append(copy.copy(s2))
+        if(resID == 2) :
+            RS[resID].BranchPC.append(copy.copy(IF_DE.InstructionPC))
 
         # Set IF_DE to empty
         IF_DE.Empty = True
 
-        return stallThisCycle
+        return stallThisCycle, PC

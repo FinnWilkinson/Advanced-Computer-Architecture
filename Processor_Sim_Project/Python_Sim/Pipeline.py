@@ -6,7 +6,6 @@ from Decode import Decode_Unit
 from Issue import Issue_Unit
 from Execute import *
 from Write_Back import Write_Back_Unit
-from Reg_To_Reg_Index import *
 import copy as copy
 
 class Pipeline:
@@ -25,23 +24,25 @@ class Pipeline:
         self.writeBackUnit = Write_Back_Unit()
 
 
-    def advance(self, PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, ARF, MEM, INSTR, ROB, RAT, error) :
+    def advance(self, PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, INSTR, ROB, RAT, BIPB, BTB, MWB, branchPredType, error) :
         stallThisCycle = False
         
         # Advance back to front to ensure pipeline can progress
         
         # WRITE BACK (WB) - DONE
-        self.writeBackUnit.writeBack(ROB, RAT, ARF)
+        self.writeBackUnit.writeBack(ROB, RAT, ARF, BIPB)
+
+        #print("WB commit = " + str(ROB.CommitPtr) + ", issue = " + str(ROB.IssuePtr))
 
         # EXECUTE (EX) - DONE
         for i in range(0,4) :
             if(self.IS_EX[i].Empty is False) :
                 output = None
                 #print("EX " + str(self.IS_EX[i].InstructionNumber) + "  " + str(self.IS_EX[i].Op) + "  " + str(self.IS_EX[i].D1) + "  " + str(self.IS_EX[i].S1) + "  " + str(self.IS_EX[i].S2))
-                error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output = self.EU[i].executeInstruction(self.IS_EX, i, ARF, MEM, PC, finished, branchExecutedCount, branchTakenCount)
+                error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output, correctBranchPreds = self.EU[i].executeInstruction(self.IS_EX, i, ARF, MEM, PC, finished, branchExecutedCount, branchTakenCount, BIPB, BTB, MWB, branchPredType, correctBranchPreds)
                 # If branch taken (error = 1), flush pipeline
                 if(error == 1) : 
-                    flushCount, instructionFetchCount = self.flush(self.IS_EX[i].InstructionNumber, flushCount, ARF, instructionFetchCount, ROB, RAT)
+                    flushCount, instructionFetchCount = self.flush(self.IS_EX[i].InstructionNumber, flushCount, ARF, instructionFetchCount, ROB, RAT, BIPB)
                     error = 0   # Reset error for Main to process correctly
                 # If multi-cycle instruction (error = 2), delay output
                 if(error != 2) :  
@@ -56,40 +57,41 @@ class Pipeline:
 
 
         #for j in range(0,3) :
-        #    for i in range(0, len(self.RS[j].Instruction)) :
-        #                print("RS " + str(self.RS[j].Instruction[i].instructionNumber) + "  " + str(self.RS[j].Op[i]) + "  " + str(self.RS[j].D1[i]) + "  " + str(self.RS[j].V1[i]) + "  " + str(self.RS[j].V2[i]))
+         #   for i in range(0, len(self.RS[j].Instruction)) :
+          #              print("RS " + str(self.RS[j].Instruction[i].instructionNumber) + "  " + str(self.RS[j].Op[i]) + "  " + str(self.RS[j].D1[i]) + "  " + str(self.RS[j].V1[i]) + "  " + str(self.RS[j].V2[i]))
 
 
         # ISSUE (IS) - DONE
-        tempStallIndicatorIS = self.issueUnit.issue(self.RS, self.IS_EX, ARF, ROB)  
+        tempStallIndicatorIS = self.issueUnit.issue(self.RS, self.IS_EX, ARF, ROB, branchPredType)  
         if tempStallIndicatorIS == True and instructionFetchCount > 3 :
             stallThisCycle = copy.copy(stallThisCycle or True)
 
 
         # DECODE (DE) - DONE
         if self.IF_DE.Empty is False :
-            tempStallIndicatorDE = self.decodeUnit.decode(self.IF_DE, self.RS, ARF, RAT, ROB)  
+            tempStallIndicatorDE, PC = self.decodeUnit.decode(self.IF_DE, self.RS, ARF, RAT, ROB, BIPB, BTB, PC, branchPredType)  
             if tempStallIndicatorDE == True and instructionFetchCount > 2 :
                 stallThisCycle = copy.copy(stallThisCycle or True)
                     
-        #print("IF " + str(self.IF_DE.Instruction.instructionNumber) + "  " + str(self.IF_DE.Instruction.opCode) + "  " + str(self.IF_DE.Instruction.operand1) + "  " + str(self.IF_DE.Instruction.operand2) + "  " + str(self.IF_DE.Instruction.operand3))
+        #print("DE " + str(self.IF_DE.Instruction.instructionNumber) + "  " + str(self.IF_DE.Instruction.opCode) + "  " + str(self.IF_DE.Instruction.operand1) + "  " + str(self.IF_DE.Instruction.operand2) + "  " + str(self.IF_DE.Instruction.operand3))
 
         # INSTRUCTION FETCH (IF) - DONE
         if self.IF_DE.Empty is True and PC < len(INSTR):
-            PC, instructionFetchCount = self.fetchUnit.fetchNext(PC, INSTR, self.IF_DE, instructionFetchCount)
+            PC, instructionFetchCount = self.fetchUnit.fetchNext(PC, INSTR, self.IF_DE, instructionFetchCount, BTB, BIPB, branchPredType)
         elif self.IF_DE.Empty is False :
             stallThisCycle = copy.copy(stallThisCycle or True)
 
+        #print("IF " + str(self.IF_DE.Instruction.instructionNumber) + "  " + str(self.IF_DE.Instruction.opCode) + "  " + str(self.IF_DE.Instruction.operand1) + "  " + str(self.IF_DE.Instruction.operand2) + "  " + str(self.IF_DE.Instruction.operand3))
 
         # Increase stall count if stall in pipeline
         if stallThisCycle == True :
             stallCount += 1
 
-        return PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, ARF, MEM, ROB, RAT, error
+        return PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, ROB, RAT, error
 
     
     # All instrucions with instructionNumber > than this function's input are removed, ROB and RAT are updated accordingly
-    def flush(self, instructionNumber, flushCount, ARF, instructionFetchCount, ROB, RAT) :        
+    def flush(self, instructionNumber, flushCount, ARF, instructionFetchCount, ROB, RAT, BIPB) :        
         # Flush ID_DE
         if(self.IF_DE.Instruction.instructionNumber > instructionNumber) :
             instructionFetchCount -= 1
@@ -112,7 +114,7 @@ class Pipeline:
                         newROBaddr = ""
                         while True :
                             index = copy.copy( ((index - 1 + 128)%128) )    # reduce index by 1, if goes to negative loop around like ROB pointer does
-                            if(ROB.Register[index] == ogReg) :
+                            if(ROB.Register[index] == ogReg and ROB.InstructionNumber[index] <= instructionNumber) :
                                 # Found replacement
                                 newROBaddr = copy.copy("ROB" + str(index))
                                 break
@@ -131,6 +133,22 @@ class Pipeline:
                     # Set invalid in RS 
                     self.RS[k].Instruction[i].Valid = False              
                     
+        # Flush IS_EX
+        for i in range(0, 4) :
+            if(self.IS_EX[i].InstructionNumber > instructionNumber) :
+                self.IS_EX[i].Empty = True
+
+        # Flush BIPB (Branch in Pipeline Buffer)
+        currentIndex = 0
+        listLength = len(BIPB.BranchPC)
+        while currentIndex < listLength :
+            if(BIPB.InstructionNumber[currentIndex] > instructionNumber) :
+                BIPB.BranchPC.pop(currentIndex)
+                BIPB.InstructionNumber.pop(currentIndex)
+                BIPB.Prediction.pop(currentIndex)
+                listLength -= 1
+            else :
+                currentIndex += 1
     
         flushCount += 1
         return flushCount, instructionFetchCount

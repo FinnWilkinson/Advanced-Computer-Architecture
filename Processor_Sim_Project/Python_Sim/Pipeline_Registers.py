@@ -4,13 +4,13 @@ class IF_DE_Reg :
     def __init__(self) :
         self.Empty = True
         self.Instruction = Instruction(0,0,0,0,0)
-        self.TargetAddress = 0                      # Used for branch target address
+        self.InstructionPC = 0
 
 
 class ReservationStation :
     def __init__(self) :
         self.Instruction = list()
-        self.TargetAddress = list()     # Used for branch target address
+        self.BranchPC = list()
         self.Op = list()                # Operation used on s1, s2
         self.D1 = list()                # Destination ROB address OR if read only instruction, value at address operand1
         self.V1 = list()                # 0 if value in S1 is correct, otherwise ROB address
@@ -22,8 +22,8 @@ class ReservationStation :
 class IS_EX_Reg :
     def __init__(self) :
         self.Empty = True
-        self.TargetAddress = 0      # Used for branch target address
         self.InstructionNumber = 0  # Instruction sequence number of instruction
+        self.BranchPC = 0           # PC of branch (if applicable)
         self.Op = ""                # Operation used on s1, s2
         self.D1 = ""                # Destination address
         self.S1 = 0                 # Operand 1
@@ -33,14 +33,12 @@ class IS_EX_Reg :
 class ReOrderBuffer :
     def __init__(self) :
         self.Register = [" "] * 128
+        self.InstructionNumber = [0] * 128
         self.Value = [0] * 128
         self.Complete = [0] * 128   # 0 = not completed, 1 = completed
         self.CommitPtr = 0          # Points to index to write back to ARF next
         self.IssuePtr = 0           # Points to index to assign instruction to next
 
-    # !! NEED TO IMPLEMENT !!
-    def flush(self, instructionNumber, RAT) :
-        return False
 
 class RegAddrTable :
     def __init__(self) :

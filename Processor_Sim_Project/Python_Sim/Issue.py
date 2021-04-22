@@ -1,5 +1,4 @@
 from Instruction import Instruction
-from Reg_To_Reg_Index import *
 import copy as copy
 
 class Issue_Unit :
@@ -10,7 +9,7 @@ class Issue_Unit :
         return
 
 
-    def issue(self, RS, IS_EX, ARF, ROB) :
+    def issue(self, RS, IS_EX, ARF, ROB, branchPredType) :
         stallThisCycle = False
         instructionsIssued = 0
         ArithStall = False
@@ -29,7 +28,6 @@ class Issue_Unit :
                     # Check Valid, if not remove
                     if(RS[0].Instruction[i].Valid == False) :
                         RS[0].Instruction.pop(i)
-                        RS[0].TargetAddress.pop(i)
                         RS[0].Op.pop(i)
                         RS[0].D1.pop(i)
                         RS[0].V1.pop(i)
@@ -57,23 +55,22 @@ class Issue_Unit :
                         else :
                             # Value not ready, continue to next in list
                             continue
-
-                    # If no branch that preceeds it, Issue          !! EDIT OUT WITH BRANCH PREDICTION !!
-                    preceedingBranch = False
-                    for j in range(0, len(RS[2].Instruction)) :
-                        if(RS[2].Instruction[j].instructionNumber < RS[0].Instruction[i].instructionNumber) :
-                            if(RS[2].Op[j] in self.branchInstructions) :
-                                preceedingBranch = True
+                    if(branchPredType == 0) :
+                        # If no branch that preceeds it, Issue          Only with no branch prediction
+                        preceedingBranch = False
+                        for j in range(0, len(RS[2].Instruction)) :
+                            if(RS[2].Instruction[j].instructionNumber < RS[0].Instruction[i].instructionNumber) :
+                                if(RS[2].Op[j] in self.branchInstructions) :
+                                    preceedingBranch = True
+                                    break
+                            else :
                                 break
-                        else :
+                        if(preceedingBranch == True) :
+                            stallThisCycle = True       # preceeding branch so stalled
+                            ArithStall = True           # Set so dont duplicate stall count with other EU
                             break
-                    if(preceedingBranch == True) :
-                        stallThisCycle = True       # preceeding branch so stalled
-                        ArithStall = True           # Set so dont duplicate stall count with other EU
-                        break
 
                     # Issue to EU
-                    IS_EX[0].TargetAddress = copy.copy(RS[0].TargetAddress[i])
                     IS_EX[0].InstructionNumber = copy.copy(RS[0].Instruction[i].instructionNumber)
                     IS_EX[0].Op = copy.copy(RS[0].Op[i])
                     IS_EX[0].D1 = copy.copy(RS[0].D1[i])
@@ -83,7 +80,6 @@ class Issue_Unit :
                     
                     # Remove from RS
                     RS[0].Instruction.pop(i)
-                    RS[0].TargetAddress.pop(i)
                     RS[0].Op.pop(i)
                     RS[0].D1.pop(i)
                     RS[0].V1.pop(i)
@@ -105,7 +101,6 @@ class Issue_Unit :
                     # Check Valid, if not remove
                     if(RS[0].Instruction[i].Valid == False) :
                         RS[0].Instruction.pop(i)
-                        RS[0].TargetAddress.pop(i)
                         RS[0].Op.pop(i)
                         RS[0].D1.pop(i)
                         RS[0].V1.pop(i)
@@ -134,21 +129,21 @@ class Issue_Unit :
                             # Value not ready, continue to next in list
                             continue
 
-                    # If no branch that preceeds it, Issue          !! EDIT OUT WITH BRANCH PREDICTION !!
-                    preceedingBranch = False
-                    for j in range(0, len(RS[2].Instruction)) :
-                        if(RS[2].Instruction[j].instructionNumber < RS[0].Instruction[i].instructionNumber) :
-                            if(RS[2].Op[j] in self.branchInstructions) :
-                                preceedingBranch = True
+                    if(branchPredType == 0) :
+                        # If no branch that preceeds it, Issue          Only with no branch prediction
+                        preceedingBranch = False
+                        for j in range(0, len(RS[2].Instruction)) :
+                            if(RS[2].Instruction[j].instructionNumber < RS[0].Instruction[i].instructionNumber) :
+                                if(RS[2].Op[j] in self.branchInstructions) :
+                                    preceedingBranch = True
+                                    break
+                            else :
                                 break
-                        else :
+                        if(preceedingBranch == True) :
+                            stallThisCycle = True       # preceeding branch so stalled
                             break
-                    if(preceedingBranch == True) :
-                        stallThisCycle = True       # preceeding branch so stalled
-                        break
 
                     # Issue to EU
-                    IS_EX[1].TargetAddress = copy.copy(RS[0].TargetAddress[i])
                     IS_EX[1].InstructionNumber = copy.copy(RS[0].Instruction[i].instructionNumber)
                     IS_EX[1].Op = copy.copy(RS[0].Op[i])
                     IS_EX[1].D1 = copy.copy(RS[0].D1[i])
@@ -158,7 +153,6 @@ class Issue_Unit :
                     
                     # Remove from RS
                     RS[0].Instruction.pop(i)
-                    RS[0].TargetAddress.pop(i)
                     RS[0].Op.pop(i)
                     RS[0].D1.pop(i)
                     RS[0].V1.pop(i)
@@ -184,7 +178,6 @@ class Issue_Unit :
                     # Check Valid, if not remove
                     if(RS[1].Instruction[i].Valid == False) :
                         RS[1].Instruction.pop(i)
-                        RS[1].TargetAddress.pop(i)
                         RS[1].Op.pop(i)
                         RS[1].D1.pop(i)
                         RS[1].V1.pop(i)
@@ -223,22 +216,21 @@ class Issue_Unit :
                         else :
                             # Value not ready, continue to next in list
                             continue
-
-                    # If no branch that preceeds it, Issue          !! EDIT OUT WITH BRANCH PREDICTION !!
-                    preceedingBranch = False
-                    for j in range(0, len(RS[2].Instruction)) :
-                        if(RS[2].Instruction[j].instructionNumber < RS[1].Instruction[i].instructionNumber) :
-                            if(RS[2].Op[j] in self.branchInstructions) :
-                                preceedingBranch = True
+                    if(branchPredType == 0) :
+                        # If no branch that preceeds it, Issue          Only with no branch prediction
+                        preceedingBranch = False
+                        for j in range(0, len(RS[2].Instruction)) :
+                            if(RS[2].Instruction[j].instructionNumber < RS[1].Instruction[i].instructionNumber) :
+                                if(RS[2].Op[j] in self.branchInstructions) :
+                                    preceedingBranch = True
+                                    break
+                            else :
                                 break
-                        else :
+                        if(preceedingBranch == True) :
+                            stallThisCycle = True       # preceeding branch so stalled
                             break
-                    if(preceedingBranch == True) :
-                        stallThisCycle = True       # preceeding branch so stalled
-                        break
 
                     # Issue to EU
-                    IS_EX[2].TargetAddress = copy.copy(RS[1].TargetAddress[i])
                     IS_EX[2].InstructionNumber = copy.copy(RS[1].Instruction[i].instructionNumber)
                     IS_EX[2].Op = copy.copy(RS[1].Op[i])
                     IS_EX[2].D1 = copy.copy(RS[1].D1[i])
@@ -248,7 +240,6 @@ class Issue_Unit :
                     
                     # Remove from RS
                     RS[1].Instruction.pop(i)
-                    RS[1].TargetAddress.pop(i)
                     RS[1].Op.pop(i)
                     RS[1].D1.pop(i)
                     RS[1].V1.pop(i)
@@ -272,7 +263,7 @@ class Issue_Unit :
                     # Check Valid, if not remove
                     if(RS[2].Instruction[i].Valid == False) :
                         RS[2].Instruction.pop(i)
-                        RS[2].TargetAddress.pop(i)
+                        RS[2].BranchPC.pop(i)
                         RS[2].Op.pop(i)
                         RS[2].D1.pop(i)
                         RS[2].V1.pop(i)
@@ -323,22 +314,23 @@ class Issue_Unit :
                             # Value not ready, continue to next in list
                             continue
 
-                    # If no branch that preceeds it, Issue          !! EDIT OUT WITH BRANCH PREDICTION !!
-                    preceedingBranch = False
-                    for j in range(0, len(RS[2].Instruction)) :
-                        if(RS[2].Instruction[j].instructionNumber < RS[2].Instruction[i].instructionNumber) :
-                            if(RS[2].Op[j] in self.branchInstructions) :
-                                preceedingBranch = True
+                    if(branchPredType == 0) :
+                        # If no branch that preceeds it, Issue          Only with no branch prediction
+                        preceedingBranch = False
+                        for j in range(0, len(RS[2].Instruction)) :
+                            if(RS[2].Instruction[j].instructionNumber < RS[2].Instruction[i].instructionNumber) :
+                                if(RS[2].Op[j] in self.branchInstructions) :
+                                    preceedingBranch = True
+                                    break
+                            else :
                                 break
-                        else :
-                            break
-                    if(preceedingBranch == True) :
-                        stallThisCycle = True       # preceeding branch so stalled
-                        break             
+                        if(preceedingBranch == True) :
+                            stallThisCycle = True       # preceeding branch so stalled
+                            break             
 
                     # Issue to EU
-                    IS_EX[3].TargetAddress = copy.copy(RS[2].TargetAddress[i])
                     IS_EX[3].InstructionNumber = copy.copy(RS[2].Instruction[i].instructionNumber)
+                    IS_EX[3].BranchPC = copy.copy(RS[2].BranchPC[i])
                     IS_EX[3].Op = copy.copy(RS[2].Op[i])
                     IS_EX[3].D1 = copy.copy(RS[2].D1[i])
                     IS_EX[3].S1 = copy.copy(RS[2].S1[i])
@@ -347,7 +339,7 @@ class Issue_Unit :
                     
                     # Remove from RS
                     RS[2].Instruction.pop(i)
-                    RS[2].TargetAddress.pop(i)
+                    RS[2].BranchPC.pop(i)
                     RS[2].Op.pop(i)
                     RS[2].D1.pop(i)
                     RS[2].V1.pop(i)

@@ -4,6 +4,7 @@ from Pipeline import Pipeline
 from Print import *
 from Load_Assembly import *
 from Pipeline_Registers import *
+from Branch_Prediction import *
 
 # Global values
 finished = False
@@ -26,6 +27,11 @@ INSTR = [Instruction(0,0,0,0,0)] * 512      # Instruction memory
 ROB = ReOrderBuffer()                       # Global Re-order Buffer
 RAT = RegAddrTable()                        # Global Register Address Table
 
+BIPB = BranchPipelineBuffer()               # Global Branch in Pipeline Buffer
+BTB = BranchTargetBuffer()                  # Gloabl Branch Target Buffer
+MWB = MemoryWriteBuffer()                   # Global Memory Write Back Buffer
+
+
 pipeline_0 = Pipeline()
 
 if __name__=="__main__" :
@@ -39,18 +45,25 @@ if __name__=="__main__" :
 
     # Initialise values
     error = 0
-    nextInstruction = None
-    targetAddress = 0
+    branchPredType = 0                      # 0 = Off (default), 1 = Fixed, 2 = Static, 3 = 1-bit dynamic, 4 = 2-bit dynamic
+    if("--BPFixed" in sys.argv) :
+        branchPredType = 1
+    if("--BPStatic" in sys.argv) :
+        branchPredType = 2
+    if("--BPDynamic1" in sys.argv) :
+        branchPredType = 3
+    if("--BPDynamic2" in sys.argv) :
+        branchPredType = 4
 
     #Effective clock, advancing pipeline
     while not finished :
         instructionsExeThisCycle = instructionExecuteCount
-        PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, ARF, MEM, ROB, RAT, error = pipeline_0.advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, stallCount, flushCount, finished, ARF, MEM, INSTR, ROB, RAT, error)
+        PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, ROB, RAT, error = pipeline_0.advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, INSTR, ROB, RAT, BIPB, BTB, MWB, branchPredType, error)
         cycles += 1
         instructionsExeThisCycle = instructionExecuteCount - instructionsExeThisCycle
         averageILP = round(instructionExecuteCount / cycles, 2)
 
-        if(len(sys.argv) > 2 and sys.argv[2] == "--verbose") :
+        if(len(sys.argv) > 2 and "--verbose" in sys.argv) :
             # Print initial system information at users discretion
             printSysInfo(ARF, MEM, INSTR, RAT, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)
         

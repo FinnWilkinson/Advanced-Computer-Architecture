@@ -28,14 +28,16 @@ class Fetch_Unit :
                     btbIndex = i
                     break
 
-            # Branch prediction target address
+            # If seen branch PC before, predict and load into BIPB
             if(btbIndex != -1) :
                 # Add branch to Branch in Pipeline Buffer
                 BIPB.BranchPC.append(copy.copy(PC))
                 BIPB.InstructionNumber.append(copy.copy(nextInstruction.instructionNumber))
                 BIPB.Prediction.append(copy.copy(getBranchPred(branchPredType, BTB, btbIndex)))
+                # If predicted taken, update PC
                 if(getBranchPred(branchPredType, BTB, btbIndex) == True) :
                     PC = copy.copy(BTB.TargetAddress[btbIndex])
+                # Otherwise, increment PC
                 else :
                     PC += 1
             else :

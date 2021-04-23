@@ -100,9 +100,9 @@ ADDI r2, r2, 1
 
 //main loop added around core core (i.e. not initialising memory) to get a better ILP average
 //r23 used for loop max, r22 used for loop counter
-//ADDI r23, r0, 100
-//ADD r22, r0, r0
-//Main:
+ADDI r23, r0, 100
+ADD r22, r0, r0
+Main:
 
 // r1 = array start location, r2 = array end location
 // r3 = low index, r4 = high index, r5 = partition index
@@ -195,6 +195,6 @@ ADDI r3, r5, 1
 BR Quicksort
 
 End:
-//ADDI r22, r22, 1
-//BLT r22, r23, Main
+ADDI r22, r22, 1
+BLT r22, r23, Main
 HALT

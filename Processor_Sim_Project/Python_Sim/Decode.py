@@ -28,15 +28,18 @@ class Decode_Unit :
                     # Branch not executed before so not in BTB
                     BIPB.BranchPC.append(copy.copy(IF_DE.InstructionPC))
                     BIPB.InstructionNumber.append(copy.copy(nextInstruction.instructionNumber))
-                    # Not in BTB so will default to Fixed prediction (Taken) (set branchPredType = -1 so function defaults)
-                    BIPB.Prediction.append(copy.copy(getBranchPred(-1, BTB, 1)))
+                    # Not in BTB so will default to Fixed prediction (Taken / True)
+                    BIPB.Prediction.append(True)
 
                     # Add Branch to BTB
                     BTB.BranchPC.append(copy.copy(IF_DE.InstructionPC))
+                    BTB.BranchType.append(copy.copy(nextInstruction.opCode))
                     if(nextInstruction.opCode == "BR" or nextInstruction.opCode == "JMP") :
-                        BTB.LastResult.append((True, True))
+                        BTB.LastResult.append(True)
+                        BTB.Last2Result.append(3)
                     else :
-                        BTB.LastResult.append((True, None))
+                        BTB.LastResult.append(True)
+                        BTB.Last2Result.append(2)
 
                     if(nextInstruction.opCode == "BR") :
                         BTB.TargetAddress.append(copy.copy(int(nextInstruction.operand1)))
@@ -48,7 +51,7 @@ class Decode_Unit :
                         PC = copy.copy(int(nextInstruction.operand3))
                     else :
                         # Need to update in Execute after register is read and address known
-                        BTB.TargetAddress.append(-1)
+                        BTB.TargetAddress.append(0)
                 
         
 

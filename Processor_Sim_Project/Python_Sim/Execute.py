@@ -159,9 +159,10 @@ class BRLGC_Execution_Unit :
         # BEQ
         elif IS_EX[EUindex].Op == "BEQ": 
             branchExecutedCount += 1
+            # No branch predictor
             if(branchPredType == 0) :
                 if(IS_EX[EUindex].D1 == IS_EX[EUindex].S1) :
-                    PC = IS_EX[EUindex].S2
+                    PC = copy.copy(IS_EX[EUindex].S2)
                     branchTakenCount += 1
                     error = 1   # Flush pipeline
             else :
@@ -170,11 +171,7 @@ class BRLGC_Execution_Unit :
                     branchTakenCount += 1
                     taken = True
                 # Get BTB index
-                btbIndex = 0
-                for k in range(0, len(BTB.BranchPC)) :
-                    if(BTB.BranchPC[k] == IS_EX[EUindex].BranchPC) :
-                        btbIndex = k
-                        break
+                btbIndex = BTB.BranchPC.index(IS_EX[EUindex].BranchPC)
                 # Do branch
                 for i in range(0, len(BIPB.BranchPC)) :
                     if(BIPB.BranchPC[i] == IS_EX[EUindex].BranchPC) :
@@ -183,7 +180,10 @@ class BRLGC_Execution_Unit :
                             correctBranchPreds += 1
                         else :
                             # Unsuccessful Prediction
-                            PC = copy.copy(BTB.BranchPC[btbIndex] + 1)
+                            if(taken == True) :
+                                PC = copy.copy(IS_EX[EUindex].S2)
+                            else :
+                                PC = copy.copy(BTB.BranchPC[btbIndex]+1)
                             error = 1   # Flush pipeline
                         BIPB.remove(IS_EX[EUindex].InstructionNumber)
                         BTB.updateResult(btbIndex, taken)
@@ -192,9 +192,10 @@ class BRLGC_Execution_Unit :
         # BLT
         elif IS_EX[EUindex].Op == "BLT": 
             branchExecutedCount += 1
+            # No branch predictor
             if(branchPredType == 0) :
                 if(IS_EX[EUindex].D1 < IS_EX[EUindex].S1) :
-                    PC = IS_EX[EUindex].S2
+                    PC = copy.copy(IS_EX[EUindex].S2)
                     branchTakenCount += 1
                     error = 1   # Flush pipeline
             else :
@@ -203,11 +204,7 @@ class BRLGC_Execution_Unit :
                     branchTakenCount += 1
                     taken = True
                 # Get BTB index
-                btbIndex = 0
-                for k in range(0, len(BTB.BranchPC)) :
-                    if(BTB.BranchPC[k] == IS_EX[EUindex].BranchPC) :
-                        btbIndex = k
-                        break
+                btbIndex = BTB.BranchPC.index(IS_EX[EUindex].BranchPC)
                 # Do branch
                 for i in range(0, len(BIPB.BranchPC)) :
                     if(BIPB.BranchPC[i] == IS_EX[EUindex].BranchPC) :
@@ -216,7 +213,10 @@ class BRLGC_Execution_Unit :
                             correctBranchPreds += 1
                         else :
                             # Unsuccessful Prediction
-                            PC = copy.copy(BTB.BranchPC[btbIndex] + 1)
+                            if(taken == True) :
+                                PC = copy.copy(IS_EX[EUindex].S2)
+                            else :
+                                PC = copy.copy(BTB.BranchPC[btbIndex]+1)
                             error = 1   # Flush pipeline
                         BIPB.remove(IS_EX[EUindex].InstructionNumber)
                         BTB.updateResult(btbIndex, taken)

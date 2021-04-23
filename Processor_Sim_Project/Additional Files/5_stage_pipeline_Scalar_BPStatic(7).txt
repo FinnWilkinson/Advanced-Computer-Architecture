@@ -1,0 +1,105 @@
+Factorial (looped 100 times - excluding memory initialisation):
+│ PC = 15 │ Cycles = 5715 │ Instructions Fetched = 5608 │ Instructions Executed = 5505 | Instructions Executed This Cycle = 1 | Average IPC = 0.96 |
+| Branches Executed = 2600 | Branches Taken = 1399 | Correct Branch Predictions = 2498 | Cycles Stalled = 0 | Flushes = 102 |
+
+Register Address Table :
+────────────────────────
+│ r0 = r0 │ r1 = r1 │ r2 = r2 │ r3 = r3 │ r4 = r4 │ r5 = r5 │ r6 = r6 │ r7 = r7 │
+│ r8 = r8 │ r9 = r9 │ r10 = r10 │ r11 = r11 │ r12 = r12 │ r13 = r13 │ r14 = r14 │ r15 = r15 │
+│ r16 = r16 │ r17 = r17 │ r18 = r18 │ r19 = r19 │ r20 = r20 │ r21 = r21 │ r22 = r22 │ r23 = r23 │
+│ r24 = r24 │ r25 = r25 │ r26 = r26 │ r27 = r27 │ r28 = r28 │ r29 = r29 │ r30 = r30 │ r31 = r31 │
+
+Architectural Register File :
+─────────────────────────────
+│ r0 = 0 │ r1 = 13 │ r2 = 479001600 │ r3 = 12 │ r4 = 0 │ r5 = 0 │ r6 = 0 │ r7 = 0 │
+│ r8 = 0 │ r9 = 0 │ r10 = 0 │ r11 = 0 │ r12 = 0 │ r13 = 0 │ r14 = 0 │ r15 = 0 │
+│ r16 = 0 │ r17 = 0 │ r18 = 0 │ r19 = 0 │ r20 = 0 │ r21 = 0 │ r22 = 100 │ r23 = 100 │
+│ r24 = 0 │ r25 = 0 │ r26 = 0 │ r27 = 0 │ r28 = 0 │ r29 = 0 │ r30 = 0 │ r31 = 0 │
+
+Main Memory - 1024 represented as 32x32 (Indecies 0 to 31 are top row):
+───────────────────────────────────────────────────────────────────────
+[[       12         0 479001600         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0
+          0         0         0]
+...
+
+
+
+Quick Sort (looped 100 times - excluding memory initialisation):
+│ PC = 142 │ Cycles = 626349 │ Instructions Fetched = 571581 │ Instructions Executed = 510933 | Instructions Executed This Cycle = 1 | Average IPC = 0.82 |
+| Branches Executed = 144283 | Branches Taken = 132659 | Correct Branch Predictions = 89521 | Cycles Stalled = 149671 | Flushes = 54762 |
+
+Register Address Table :
+────────────────────────
+│ r0 = r0 │ r1 = r1 │ r2 = r2 │ r3 = r3 │ r4 = r4 │ r5 = r5 │ r6 = r6 │ r7 = r7 │
+│ r8 = r8 │ r9 = r9 │ r10 = r10 │ r11 = r11 │ r12 = r12 │ r13 = r13 │ r14 = r14 │ r15 = r15 │
+│ r16 = r16 │ r17 = r17 │ r18 = r18 │ r19 = r19 │ r20 = r20 │ r21 = r21 │ r22 = r22 │ r23 = r23 │
+│ r24 = r24 │ r25 = r25 │ r26 = r26 │ r27 = r27 │ r28 = r28 │ r29 = r29 │ r30 = r30 │ r31 = r31 │
+
+Architectural Register File :
+─────────────────────────────
+│ r0 = 0 │ r1 = 0 │ r2 = 29 │ r3 = 30 │ r4 = 29 │ r5 = 29 │ r6 = 34 │ r7 = 0 │
+│ r8 = 1 │ r9 = 0 │ r10 = 5 │ r11 = 34 │ r12 = 34 │ r13 = 0 │ r14 = 0 │ r15 = 0 │
+│ r16 = 0 │ r17 = 0 │ r18 = 0 │ r19 = 0 │ r20 = 0 │ r21 = 0 │ r22 = 100 │ r23 = 100 │
+│ r24 = 0 │ r25 = 0 │ r26 = 0 │ r27 = 0 │ r28 = 0 │ r29 = 0 │ r30 = 139 │ r31 = 40 │
+
+Main Memory - 1024 represented as 32x32 (Indecies 0 to 31 are top row):
+───────────────────────────────────────────────────────────────────────
+[[  5  34 109 151 162 238 261 299 318 320 341 366 394 424 438 481 506 545 570 597 610 618 631 722 756 842 883 900 917 958   0   0]
+ [  0   0   0   0   0   0   0   0 139   0  29  29 133   0  28  28 133   0  27  27 133   0  26  26 133   0  25  25 133   0  24  24]
+ [133   0  23  23 133   0  22  22 133   0  21  21 133   0  20  20 133   0  19  19 133   0  18  18 133   0  17  17 133   0  16  16]
+ [133   0  15  15 133   0  14  14 133   0  13  13 133   0  12  12 133   0  11  11 133   0  10  10 133   0   9   9 133   0   8   8]
+ [133   0   7   7 133   0   6   6 133   0   5   5 133   0   4   4 133   0   3   3 133   0   2   2 133   0   1   1 133   0   0   0]
+...
+
+
+
+
+Vector Addition (looped 100 times - excluding memory initialisation):
+│ PC = 53 │ Cycles = 6652 │ Instructions Fetched = 6544 │ Instructions Executed = 6543 | Instructions Executed This Cycle = 1 | Average IPC = 0.98 |
+| Branches Executed = 1100 | Branches Taken = 999 | Correct Branch Predictions = 999 | Cycles Stalled = 3000 | Flushes = 101 |
+
+Register Address Table :
+────────────────────────
+│ r0 = r0 │ r1 = r1 │ r2 = r2 │ r3 = r3 │ r4 = r4 │ r5 = r5 │ r6 = r6 │ r7 = r7 │
+│ r8 = r8 │ r9 = r9 │ r10 = r10 │ r11 = r11 │ r12 = r12 │ r13 = r13 │ r14 = r14 │ r15 = r15 │
+│ r16 = r16 │ r17 = r17 │ r18 = r18 │ r19 = r19 │ r20 = r20 │ r21 = r21 │ r22 = r22 │ r23 = r23 │
+│ r24 = r24 │ r25 = r25 │ r26 = r26 │ r27 = r27 │ r28 = r28 │ r29 = r29 │ r30 = r30 │ r31 = r31 │
+
+Architectural Register File :
+─────────────────────────────
+│ r0 = 0 │ r1 = 10 │ r2 = 10 │ r3 = 321 │ r4 = 3 │ r5 = 324 │ r6 = 0 │ r7 = 0 │
+│ r8 = 0 │ r9 = 0 │ r10 = 0 │ r11 = 0 │ r12 = 0 │ r13 = 0 │ r14 = 0 │ r15 = 0 │
+│ r16 = 0 │ r17 = 0 │ r18 = 0 │ r19 = 0 │ r20 = 0 │ r21 = 0 │ r22 = 100 │ r23 = 100 │
+│ r24 = 0 │ r25 = 0 │ r26 = 0 │ r27 = 0 │ r28 = 0 │ r29 = 0 │ r30 = 0 │ r31 = 0 │
+
+Main Memory - 1024 represented as 32x32 (Indecies 0 to 31 are top row):
+───────────────────────────────────────────────────────────────────────
+[[ 91  12  11  90  45  30  56 975  69 324   0   4   7   2  88   4   7   2 101  67 321   0  87   5   9   2  41  23  54 874   2   3]
+...
+
+
+
+Matrix Multiplication (looped 100 times - excluding memory initialisation):
+│ PC = 211 │ Cycles = 67459 │ Instructions Fetched = 66952 │ Instructions Executed = 66451 | Instructions Executed This Cycle = 1 | Average IPC = 0.99 |
+| Branches Executed = 4200 | Branches Taken = 3699 | Correct Branch Predictions = 3699 | Cycles Stalled = 27600 | Flushes = 501 |
+
+Register Address Table :
+────────────────────────
+│ r0 = r0 │ r1 = r1 │ r2 = r2 │ r3 = r3 │ r4 = r4 │ r5 = r5 │ r6 = r6 │ r7 = r7 │
+│ r8 = r8 │ r9 = r9 │ r10 = r10 │ r11 = r11 │ r12 = r12 │ r13 = r13 │ r14 = r14 │ r15 = r15 │
+│ r16 = r16 │ r17 = r17 │ r18 = r18 │ r19 = r19 │ r20 = r20 │ r21 = r21 │ r22 = r22 │ r23 = r23 │
+│ r24 = r24 │ r25 = r25 │ r26 = r26 │ r27 = r27 │ r28 = r28 │ r29 = r29 │ r30 = r30 │ r31 = r31 │
+
+Architectural Register File :
+─────────────────────────────
+│ r0 = 0 │ r1 = 66 │ r2 = 4 │ r3 = 0 │ r4 = 25 │ r5 = 4 │ r6 = 0 │ r7 = 4 │
+│ r8 = 24 │ r9 = 68 │ r10 = 4 │ r11 = 1 │ r12 = 3 │ r13 = 0 │ r14 = 43 │ r15 = 5 │
+│ r16 = 8 │ r17 = 0 │ r18 = 54 │ r19 = 45 │ r20 = 1032 │ r21 = 340 │ r22 = 32 │ r23 = 0 │
+│ r24 = 162 │ r25 = 0 │ r26 = 1566 │ r27 = 0 │ r28 = 0 │ r29 = 0 │ r30 = 100 │ r31 = 100 │
+
+Main Memory - 1024 represented as 32x32 (Indecies 0 to 31 are top row):
+───────────────────────────────────────────────────────────────────────
+[[   3    5    6   43    5   45   90    4   34   59    8   54   24    5   78    0    0   23   24   68    4    1    3    0    0    3    5    6   43   65   87    9]
+ [   5    0   46   44    8   11   22    3    0   34   59    8   54    6   43    5   45    0 1247 3902  721 2497 1775 6454 2583 7024  535 5132 3736 2716 4605 6419]
+ [ 959 1566    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0]
+...

@@ -77,8 +77,6 @@ class Pipeline:
         # INSTRUCTION FETCH (IF) - DONE
         if self.IF_DE.Empty is True and PC < len(INSTR):
             PC, instructionFetchCount = self.fetchUnit.fetchNext(PC, INSTR, self.IF_DE, instructionFetchCount, BTB, BIPB, branchPredType)
-        elif self.IF_DE.Empty is False :
-            stallThisCycle = copy.copy(stallThisCycle or True)
 
         #print("IF " + str(self.IF_DE.Instruction.instructionNumber) + "  " + str(self.IF_DE.Instruction.opCode) + "  " + str(self.IF_DE.Instruction.operand1) + "  " + str(self.IF_DE.Instruction.operand2) + "  " + str(self.IF_DE.Instruction.operand3))
 
@@ -180,7 +178,7 @@ class Pipeline:
                 # Update ROB
                 ROB.Register[robIndex] = copy.copy("SKIP")
 
-            robIndex = copy.copy((robIndex + 1)%128)
+            robIndex = copy.copy((robIndex + 1) % 128)
             
 
         # Flush BIPB (Branch in Pipeline Buffer)

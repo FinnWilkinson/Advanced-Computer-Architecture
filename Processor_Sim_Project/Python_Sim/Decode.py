@@ -15,7 +15,7 @@ class Decode_Unit :
         self.logicInstructions = ["HALT", "LSL", "LSR", "AND", "XOR", "CMP"]
         self.readOnlyINSTR = ["STR", "STRC", "JMP", "BR", "BEQ", "BLT", "HALT"]
 
-    def decode(self, IF_DE, RS, ARF, RAT, ROB, BIPB, BTB, PC, branchPredType) :
+    def decode(self, IF_DE, RS, ARF, RAT, ROB, BIPB, BTB, PC, branchPredType, LSQ) :
         stallThisCycle = False
         
         # Get instruction from IF_DE
@@ -55,14 +55,14 @@ class Decode_Unit :
         # Get Reservation station ID
         resID = 0
         # Branch or Logic
-        if nextInstruction.opCode in self.branchInstructions or nextInstruction.opCode in self.logicInstructions :
+        if(nextInstruction.opCode in self.branchInstructions or nextInstruction.opCode in self.logicInstructions) :
             if(len(RS[2].Instruction) < 8) :
                 resID = 2
             else :
                 # Full so stall this cycle (return true) and return
                 return True
         # Load or Store
-        elif nextInstruction.opCode in self.loadStoreInstructions :
+        elif(nextInstruction.opCode in self.loadStoreInstructions) :
             if(len(RS[1].Instruction) < 8) :
                 resID = 1
             else :
@@ -75,6 +75,22 @@ class Decode_Unit :
             else :
                 # Full so stall this cycle (return true) and return
                 return True
+
+        # If load or store, Assign place in LSQ
+        if(nextInstruction.opCode in self.loadStoreInstructions) :
+            # Assign place in LSQ
+            LSQindex = copy.copy(LSQ.IssuePtr)
+            LSQ.IssuePtr = copy.copy((LSQ.IssuePtr + 1) % 128)
+            # Input values
+            LSQ.InstructionNumber[LSQindex] = copy.copy(nextInstruction.instructionNumber)
+            LSQ.Complete[LSQindex] = 0
+            LSQ.Address[LSQindex] = -1
+            if(nextInstruction.opCode == "LD" or nextInstruction.opCode == "LDC") :
+                LSQ.InstructionType[LSQindex] = copy.copy("LOAD")
+            else :
+                LSQ.InstructionType[LSQindex] = copy.copy("STORE")
+            
+
 
 
         # Assign place in ROB

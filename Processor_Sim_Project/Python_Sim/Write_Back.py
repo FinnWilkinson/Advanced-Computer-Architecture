@@ -22,6 +22,7 @@ class Write_Back_Unit :
         if(ROB.Complete[ROB.CommitPtr] == 1) :
             ARF.Register[int(ROB.Register[ROB.CommitPtr][1:])] = copy.copy(ROB.Value[ROB.CommitPtr])
             self.cleanUp(ROB, RAT, ROB.Register[ROB.CommitPtr]) 
+            ROB.Register[ROB.CommitPtr] = "SKIP"
             ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 128)
 
         return 
@@ -40,3 +41,23 @@ class Write_Back_Unit :
 
         if(regCount == 1) :
             RAT.Address[int(reg[1:])] = reg
+
+    
+    # commit items in LSQ in order
+    def LSQCommit(self, LSQ, MEM, BIPB) :
+        # If branch in BIPB that is less than next to commit, wait for it to execute
+        for i in range(0, len(BIPB.BranchPC)) :
+            if(LSQ.InstructionNumber[LSQ.CommitPtr] > BIPB.InstructionNumber[i]) :
+                return
+
+        if(LSQ.Complete[LSQ.CommitPtr] == 1) :
+            if(LSQ.InstructionType[LSQ.CommitPtr] == "STORE") :
+                MEM[LSQ.Address[LSQ.CommitPtr]] = copy.copy(LSQ.Value[LSQ.CommitPtr])
+            LSQ.InstructionType[LSQ.CommitPtr] = " "
+            LSQ.InstructionNumber[LSQ.CommitPtr] = 0
+            LSQ.Address[LSQ.CommitPtr] = 0
+            LSQ.Value[LSQ.CommitPtr] = 0
+            LSQ.Complete[LSQ.CommitPtr] = 0
+            LSQ.CommitPtr = copy.copy((LSQ.CommitPtr + 1) % 128)
+
+        return

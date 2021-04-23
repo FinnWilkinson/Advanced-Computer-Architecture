@@ -44,39 +44,3 @@ class BranchTargetBuffer :
         listTemp[1] = copy.copy(temp)
         listTemp[0] = copy.copy(result)
         self.LastResult[index] = copy.copy(tuple(listTemp))
-
-
-class MemoryWriteBuffer :
-    def __init__(self) :
-        self.MemoryAddress = []
-        self.Value = []
-        self.InstructionNumber = []
-        self.BranchInstructionNumber = []
-
-    def commit(self, BranchInstructionNumber, MEM) :
-        currentItem = 0
-        listLength = len(self.Value)
-        while currentItem < listLength :
-            if(self.BranchInstructionNumber[currentItem] == BranchInstructionNumber) :
-                MEM[self.MemoryAddress[currentItem]] = copy.copy(self.Value[currentItem])
-                self.MemoryAddress.pop(currentItem)
-                self.Value.pop(currentItem)
-                self.InstructionNumber.pop(currentItem)
-                self.BranchInstructionNumber.pop(currentItem)
-                length -= 1
-            else :
-                currentItem += 1
-        return MEM
-
-    def remove(self, BranchInstructionNumber) :
-        currentItem = 0
-        listLength = len(self.Value)
-        while currentItem < listLength :
-            if(self.BranchInstructionNumber[currentItem] == BranchInstructionNumber) :
-                self.MemoryAddress.pop(currentItem)
-                self.Value.pop(currentItem)
-                self.InstructionNumber.pop(currentItem)
-                self.BranchInstructionNumber.pop(currentItem)
-                length -= 1
-            else :
-                currentItem += 1

@@ -45,3 +45,14 @@ class RegAddrTable :
         # Index of address = corresponding register in ARF i.e. index 3 = r3 address
         # Initialised to point to ARF locations 
         self.Address = ["r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23", "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31"]
+
+
+class LoadStoreQueue :
+    def __init__(self) :
+        self.InstructionType = [" "] * 128
+        self.InstructionNumber = [0] * 128
+        self.Address = [-1] * 128
+        self.Value = [0] * 128
+        self.Complete = [0] * 128   # 0 = not completed, 1 = completed
+        self.CommitPtr = 0          # Points to index to write back to ARF next
+        self.IssuePtr = 0           # Points to index to assign instruction to next

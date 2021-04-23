@@ -29,8 +29,7 @@ RAT = RegAddrTable()                        # Global Register Address Table
 
 BIPB = BranchPipelineBuffer()               # Global Branch in Pipeline Buffer
 BTB = BranchTargetBuffer()                  # Gloabl Branch Target Buffer
-MWB = MemoryWriteBuffer()                   # Global Memory Write Back Buffer
-
+LSQ = LoadStoreQueue()                      # Global Load / Store Queue
 
 pipeline_0 = Pipeline()
 
@@ -58,7 +57,7 @@ if __name__=="__main__" :
     #Effective clock, advancing pipeline
     while not finished :
         instructionsExeThisCycle = instructionExecuteCount
-        PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, ROB, RAT, error = pipeline_0.advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, INSTR, ROB, RAT, BIPB, BTB, MWB, branchPredType, error)
+        PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, ROB, RAT, BIPB, BTB, LSQ, error = pipeline_0.advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, INSTR, ROB, RAT, BIPB, BTB, LSQ, branchPredType, error)
         cycles += 1
         instructionsExeThisCycle = instructionExecuteCount - instructionsExeThisCycle
         averageILP = round(instructionExecuteCount / cycles, 2)

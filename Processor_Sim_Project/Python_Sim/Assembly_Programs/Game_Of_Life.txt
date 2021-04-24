@@ -1,0 +1,213 @@
+// 0 = dead, 1 = alive
+// MEM displayed as 32x32 grid, soft boarders so wraps around
+// 16 x 16 grid. Top left = MEM[0], Top Right = MEM[15], Bottom Left = MEM[480], Bottom Right = [495]
+//
+// Rules : Each cell interacts with its 8 direct neighbours (Left, right, up, down, diagonals)
+//	   If less than 2 alive neighbours, cell dies from mal nutrition
+//	   If more than 3 alive neighbours, cell dies from over population
+// 	   If exactly 3 aliove neighbours, dead cell becomes alive
+//
+// Soft boarder rules:
+// TOP - if (index - 32) < 0; + 512 to wrap around game board
+// RIGHT - if (index + 1) / 16 == 0; - 16 to wrap around game board
+// BOTTOM - if (index + 32) > 495; -512 to wrap around game board
+// LEFT - if (index + 1) / 32 == 0; +16 to wrap around game board
+//
+//
+// Initial set up as follows
+//	  		  1 1 1 1 1 1
+//    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+//  0[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+//  1[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+//  2[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+//  3[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+//  4[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+//  5[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+//  6[0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0]
+//  7[0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0]
+//  8[0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0]
+//  9[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// 10[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// 11[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// 12[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// 13[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// 14[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// 15[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+//
+// Final output will look as follows after 100 iterations
+//
+// [0,0,0,1,0,0,1,0,0,1,1,0,0,0,0,0]
+// [0,0,0,1,0,1,1,1,1,1,0,0,0,0,0,0]
+// [0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// [1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1]
+// [0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0]
+// [0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0]
+
+
+// Initialise in memory
+// MEM locations = 6*32 (=192) + [6, 10, 11, 12],	7*32 (=224) + [5, 6],		8*32 (=256) + [11]
+
+ADDI r1, r0, 1
+ADDI r2, r0, 32
+
+MULI r3, r2, 6
+STRC r1, r3, 6
+STRC r1, r3, 10
+STRC r1, r3, 11
+STRC r1, r3, 12
+
+MULI r3, r2, 7
+STRC r1, r3, 5
+STRC r1, r3, 6
+
+MULI r3, r2, 8
+STRC r1, r3, 11
+
+// Initialise iteration counter (r1), and max iteration value (r2)
+ADD r1, r0, r0
+ADDI r2, r0, 100
+
+// Initialise Row iterator value to 32 (r3), max row value to 16 (r5)
+ADDI r3, r0, 32
+ADDI r5, r0, 16
+
+// Initialise compare values (2 = was alive but will die, r8) (3 = was dead but will become alive, r9) (1 = currenlty alive, r13)
+ADDI r8, r0, 2
+ADDI r9, r0, 3
+
+
+Start:
+// Initialise row counter (r4), mem pointer (r6), and offset(r7)
+ADD r4, r0, r0
+ADD r6, r0, r0
+ADD r7, r0, r0
+
+
+NextRow:
+// Get cell index
+MUL r6, r4, r3
+ADD r6, r6, r7
+
+//Neighbour count = r12
+ADD r12, r0, r0
+// Get all neighbours, Sum alive ones, Neighbour index = r10, Neighbours value = r11
+//
+//
+//IMPLEMENT ME
+//
+//
+//
+
+// Update cell value, r14
+LD r14, r6, r0
+BEQ r14, r0, IsDeadCurr
+BR IsAliveCurr
+
+NextRowCont:
+// Update offset value
+ADDI r7, r7, 1
+// See if next row - If offset < 16, continue to next cell
+BLT r7, r5, NextRow
+// If end of row, re-set row offset and increase row counter
+ADD r7, r0, r0
+ADDI r4, r4, 1
+// If row counter < 16, continue
+BLT r4, r5, NextRow
+// Else finalise values
+BR FinaliseStart:
+
+
+
+FinaliseStart:
+// Initialise row counter (r4), mem pointer (r6), and offset(r7)
+ADD r4, r0, r0
+ADD r6, r0, r0
+ADD r7, r0, r0
+
+FinaliseNextRow:
+// Get cell index
+MUL r6, r4, r3
+ADD r6, r6, r7
+
+// Update cell value
+LD r19, r6, r0
+BEQ r19, r8, FUpdatetoDead
+BEQ r19, r9, FUpdateToAlive
+
+FinaliseCont:
+// Update offset value
+ADDI r7, r7, 1
+// See if next row - If offset < 16, continue to next cell
+BLT r7, r5, NextRow
+// If end of row, re-set row offset and increase row counter
+ADD r7, r0, r0
+ADDI r4, r4, 1
+// If row counter < 16, continue
+BLT r4, r5, FinaliseNextRow:
+// Else increase iteration count
+ADDI r1, r1, 1
+// If equal to 100, end
+BEQ r1, r2, End
+BR Start
+
+End:
+HALT
+
+
+FUpdatetoDead:
+ADD r19, r0, r0
+STR r19, r6, r0
+BR FinaliseCont
+
+FUpdateToAlive:
+ADDI r19, r0, 1
+STR r19, r6, r0
+BR FinaliseCont
+
+
+IsDeadCurr:
+//Neighbour count = r12
+BEQ r12, r9, MakeAliveNext
+BR NextRowCont
+
+IsAliveCurr:
+//Neighbour count = r12
+BLT r12, r8, MakeDeadNext
+BLT r9, r12, MakeDeadNext
+BR NextRowCont
+
+
+MakeDeadNext:
+// MEM index for cell = r6, r8 = 2
+STR r8, r6, r0
+
+MakeAliveNext:
+// MEM index for cell = r6, r9 = 3
+STR r9, r6, r0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

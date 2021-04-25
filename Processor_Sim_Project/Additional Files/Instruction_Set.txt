@@ -20,7 +20,7 @@
  LSR rd, ra, x 		 # RF[rd] = RF[ra] >> x
  XOR rd, ra, rb		 # RF[rd] = RF[ra] XOR RF[rb]
  AND rd, ra, rb   	 # RF[rd] = RF[ra] AND RF[rb]
-
+ MOD rd, ra, rb		 # RF[rd] = RF[ra] MOD RF[rb]
 
 
 

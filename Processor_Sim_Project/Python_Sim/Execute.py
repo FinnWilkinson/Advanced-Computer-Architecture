@@ -60,6 +60,9 @@ class ARITH_Execution_Unit :
             else :
                 error = 2       # Cycle delay occured
                 self.ExecutionCount += 1
+        # MOD
+        elif IS_EX[EUindex].Op == "MOD":
+            output = IS_EX[EUindex].S1 % IS_EX[EUindex].S2
         # Opcode not recognised
         else: 
             print("ERROR - Opcode '{}' not recognised. Exiting..." .format(IS_EX[EUindex].Op))

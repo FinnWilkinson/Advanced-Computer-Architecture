@@ -22,7 +22,7 @@ averageILP = 0.0
 
 ARF = ARegFile()                            # Register file. ARF[0] or r0 is always = 0
 MEM = [0] * 1024                            # Data memory
-INSTR = [Instruction(0,0,0,0,0)] * 512      # Instruction memory
+INSTR = [Instruction(0,0,0,0,0)] * 1024     # Instruction memory
 
 ROB = ReOrderBuffer()                       # Global Re-order Buffer
 RAT = RegAddrTable()                        # Global Register Address Table

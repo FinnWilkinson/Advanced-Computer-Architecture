@@ -37,22 +37,22 @@
 //
 // Final output will look as follows after 100 iterations
 //
-// [0,0,0,1,0,0,1,0,0,1,1,0,0,0,0,0]
-// [0,0,0,1,0,1,1,1,1,1,0,0,0,0,0,0]
-// [0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0]
 // [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 // [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 // [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 // [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 // [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-// [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0]
+// [0,0,0,0,0,0,1,1,1,0,0,1,0,1,0,0]
+// [0,0,0,0,0,0,0,0,1,1,1,0,1,0,1,1]
+// [0,0,0,0,0,0,1,1,1,0,0,0,0,1,0,0]
+// [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0]
 // [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 // [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 // [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-// [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-// [1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1]
-// [0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0]
-// [0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
 // Initialise in memory
@@ -77,7 +77,7 @@ STRC r1, r3, 11
 
 // Initialise iteration counter (r1), and max iteration value (r2)
 ADD r1, r0, r0
-ADDI r2, r0, 1
+ADDI r2, r0, 20
 
 // Initialise Row iterator value to 32 (r3), max row value to 16 (r5)
 ADDI r3, r0, 32
@@ -150,6 +150,7 @@ ADD r6, r6, r7
 
 // Update cell value
 LD r19, r6, r0
+BEQ r19, r0, FinaliseCont
 BEQ r19, r8, FUpdatetoDead
 BEQ r19, r9, FUpdateToAlive
 
@@ -159,7 +160,7 @@ FinaliseCont:
 // Update offset value
 ADDI r7, r7, 1
 // See if next row - If offset < 16, continue to next cell
-BLT r7, r5, NextRow
+BLT r7, r5, FinaliseNextRow
 // If end of row, re-set row offset and increase row counter
 ADD r7, r0, r0
 ADDI r4, r4, 1
@@ -167,7 +168,7 @@ ADDI r4, r4, 1
 BLT r4, r5, FinaliseNextRow
 // Else increase iteration count
 ADDI r1, r1, 1
-// If equal to 100, end
+// If equal to 20, end
 BEQ r1, r2, End
 BR Start
 

@@ -131,14 +131,15 @@ class BRLGC_Execution_Unit :
             branchExecutedCount += 1
             branchTakenCount += 1
             if(branchPredType != 0) :
-                for i in range(0, len(BTB.BranchPC)) :
-                    if(BTB.BranchPC[i] == IS_EX[EUindex].BranchPC) :
-                        if(IS_EX[EUindex].D1 == BTB.TargetAddress[i]) :
+                for i in range(0, len(BIPB.BranchPC)) :
+                    if(BIPB.InstructionNumber[i] == IS_EX[EUindex].InstructionNumber) :
+                        if(IS_EX[EUindex].D1 == BIPB.TargetAddress[i]) :
                             # Successful Prediction
                             correctBranchPreds += 1
                         else :
                             # Unsuccessful Prediction
-                            BTB.TargetAddress[i] = copy.copy(IS_EX[EUindex].D1)
+                            btbIndex = BTB.BranchPC.index(IS_EX[EUindex].BranchPC)
+                            BTB.TargetAddress[btbIndex] = copy.copy(IS_EX[EUindex].D1)
                             PC = copy.copy(IS_EX[EUindex].D1)
                             error = 1   # Flush pipeline
                         BIPB.remove(IS_EX[EUindex].InstructionNumber)
@@ -152,7 +153,7 @@ class BRLGC_Execution_Unit :
             branchExecutedCount += 1
             branchTakenCount += 1
             if(branchPredType == 0) :
-                PC = IS_EX[EUindex].D1
+                PC = copy.copy(IS_EX[EUindex].D1)
                 error = 1   # Flush pipeline
             else :
                 # Correct prediction always
@@ -174,7 +175,7 @@ class BRLGC_Execution_Unit :
                     branchTakenCount += 1
                     taken = True
                 # Get BTB index
-                btbIndex = BTB.BranchPC.index(IS_EX[EUindex].BranchPC)
+                btbIndex = copy.copy(BTB.BranchPC.index(IS_EX[EUindex].BranchPC))
                 # Do branch
                 for i in range(0, len(BIPB.BranchPC)) :
                     if(BIPB.BranchPC[i] == IS_EX[EUindex].BranchPC) :

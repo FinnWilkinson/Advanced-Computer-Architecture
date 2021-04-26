@@ -15,11 +15,39 @@ class Decode_Unit :
         self.logicInstructions = ["HALT", "LSL", "LSR", "AND", "XOR", "CMP"]
         self.readOnlyINSTR = ["STR", "STRC", "JMP", "BR", "BEQ", "BLT", "HALT"]
 
-    def decode(self, IF_DE, RS, ARF, RAT, ROB, BIPB, BTB, PC, branchPredType, LSQ) :
-        stallThisCycle = False
-        
+    def decode(self, IF_DE, RS, ARF, RAT, ROB, BIPB, BTB, PC, branchPredType, LSQ) :        
         # Get instruction from IF_DE
         nextInstruction = copy.copy(IF_DE.Instruction)
+
+        if(((ROB.IssuePtr + 1) % 256) == ROB.CommitPtr) :
+            return True, PC
+
+        if(nextInstruction.opCode in self.loadStoreInstructions and ((LSQ.IssuePtr + 1) % 128) == LSQ.CommitPtr) :
+            return True, PC
+
+        # Get Reservation station ID
+        resID = 0
+        # Branch or Logic
+        if(nextInstruction.opCode in self.branchInstructions or nextInstruction.opCode in self.logicInstructions) :
+            if(len(RS[2].Instruction) < 8) :
+                resID = 2
+            else :
+                # Full so stall this cycle (return true) and return
+                return True, PC
+        # Load or Store
+        elif(nextInstruction.opCode in self.loadStoreInstructions) :
+            if(len(RS[1].Instruction) < 8) :
+               resID = 1
+            else :
+                # Full so stall this cycle (return true) and return
+                return True, PC
+        # Arithmetic
+        else :
+            if(len(RS[0].Instruction) < 16) :
+               resID = 0
+            else :
+                # Full so stall this cycle (return true) and return
+                return True, PC
 
         if(branchPredType != 0) :
             # Branch Prediction
@@ -30,6 +58,7 @@ class Decode_Unit :
                     BIPB.InstructionNumber.append(copy.copy(nextInstruction.instructionNumber))
                     # Not in BTB so will default to Fixed prediction (Taken / True)
                     BIPB.Prediction.append(True)
+                    BIPB.InstructionType.append(copy.copy(nextInstruction.opCode))
 
                     # Add Branch to BTB
                     BTB.BranchPC.append(copy.copy(IF_DE.InstructionPC))
@@ -43,41 +72,19 @@ class Decode_Unit :
 
                     if(nextInstruction.opCode == "BR") :
                         BTB.TargetAddress.append(copy.copy(int(nextInstruction.operand1)))
+                        BIPB.TargetAddress.append(copy.copy(int(nextInstruction.operand1)))
                         # Update PC to target address
                         PC = copy.copy(int(nextInstruction.operand1))
                     elif(nextInstruction.opCode == "BEQ" or nextInstruction.opCode == "BLT") :
                         BTB.TargetAddress.append(copy.copy(int(nextInstruction.operand3)))
+                        BIPB.TargetAddress.append(copy.copy(int(nextInstruction.operand3)))
                         # Update PC to target address
                         PC = copy.copy(int(nextInstruction.operand3))
                     else :
                         # Need to update in Execute after register is read and address known
                         BTB.TargetAddress.append(0)
+                        BIPB.TargetAddress.append(0)
                 
-        
-
-        # Get Reservation station ID
-        resID = 0
-        # Branch or Logic
-        if(nextInstruction.opCode in self.branchInstructions or nextInstruction.opCode in self.logicInstructions) :
-            if(len(RS[2].Instruction) < 8) :
-                resID = 2
-            else :
-                # Full so stall this cycle (return true) and return
-                return True
-        # Load or Store
-        elif(nextInstruction.opCode in self.loadStoreInstructions) :
-            if(len(RS[1].Instruction) < 8) :
-                resID = 1
-            else :
-                # Full so stall this cycle (return true) and return
-                return True
-        # Arithmetic
-        else :
-            if(len(RS[0].Instruction) < 16) :
-                resID = 0
-            else :
-                # Full so stall this cycle (return true) and return
-                return True
 
         # If load or store, Assign place in LSQ
         if(nextInstruction.opCode in self.loadStoreInstructions) :
@@ -98,7 +105,7 @@ class Decode_Unit :
 
         # Assign place in ROB
         ROBindex = copy.copy(ROB.IssuePtr)
-        ROB.IssuePtr = copy.copy((ROB.IssuePtr + 1) % 128)                                # mod 128 so tat index loops around
+        ROB.IssuePtr = copy.copy((ROB.IssuePtr + 1) % 256)                                # mod 256 so tat index loops around
         # If read only, change ROB register value assigning
         if(nextInstruction.opCode in self.readOnlyINSTR) :
             ROB.Register[ROBindex] = "SKIP"                                     # SKIP as we dont need to write back value
@@ -196,4 +203,4 @@ class Decode_Unit :
         # Set IF_DE to empty
         IF_DE.Empty = True
 
-        return stallThisCycle, PC
+        return False, PC

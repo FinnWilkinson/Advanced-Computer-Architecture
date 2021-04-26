@@ -9,6 +9,10 @@ class Write_Back_Unit :
         return
 
     def writeBack(self, ROB, RAT, ARF, BIPB) :
+        # If caught up to issue ptr, do nothing
+        if(ROB.IssuePtr == ROB.CommitPtr) :
+            return
+
         # If branch in BIPB that is less than next to commit, wait for it to execute
         for i in range(0, len(BIPB.BranchPC)) :
             if(ROB.InstructionNumber[ROB.CommitPtr] == BIPB.InstructionNumber[i]) :
@@ -16,14 +20,14 @@ class Write_Back_Unit :
 
         # If read only instruction in place, move to next item in ROB
         if(ROB.Register[ROB.CommitPtr] == "SKIP") :
-            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 128)
+            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 256)
             return
 
         if(ROB.Complete[ROB.CommitPtr] == 1) :
             ARF.Register[int(ROB.Register[ROB.CommitPtr][1:])] = copy.copy(ROB.Value[ROB.CommitPtr])
             self.cleanUp(ROB, RAT, ROB.Register[ROB.CommitPtr]) 
             ROB.Register[ROB.CommitPtr] = "SKIP"
-            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 128)
+            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 256)
 
         return 
 
@@ -33,11 +37,11 @@ class Write_Back_Unit :
         index = copy.copy(ROB.CommitPtr)
         regCount = 0
         while True :
-            if(ROB.Register[index] == reg) :
-                regCount += 1
             if(index == ROB.IssuePtr) :
                 break
-            index = copy.copy((index + 1) % 128)
+            if(ROB.Register[index] == reg) :
+                regCount += 1
+            index = copy.copy((index + 1) % 256)
 
         if(regCount == 1) :
             RAT.Address[int(reg[1:])] = reg
@@ -45,6 +49,10 @@ class Write_Back_Unit :
     
     # commit items in LSQ in order
     def LSQCommit(self, LSQ, MEM, BIPB) :
+        # If caught up to issue ptr, do nothing
+        if(LSQ.IssuePtr == LSQ.CommitPtr) :
+            return
+
         # If branch in BIPB that is less than next to commit, wait for it to execute
         for i in range(0, len(BIPB.BranchPC)) :
             if(LSQ.InstructionNumber[LSQ.CommitPtr] > BIPB.InstructionNumber[i]) :

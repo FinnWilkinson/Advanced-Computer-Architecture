@@ -31,7 +31,9 @@ class BranchPipelineBuffer :
     def __init__(self) :
         self.BranchPC = []
         self.InstructionNumber = []
-        self.Prediction = []       
+        self.InstructionType = []
+        self.Prediction = []     
+        self.TargetAddress = []  
 
     def remove(self, BranchInstructionNumber) :
         for i in range(0, len(self.BranchPC)) :

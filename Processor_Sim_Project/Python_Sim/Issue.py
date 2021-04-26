@@ -220,7 +220,7 @@ class Issue_Unit :
                     if(RS[1].Op[i] == "LD" or RS[1].Op[i] == "LDC") :
                         ptr = copy.copy(LSQindex-1)
                         while True :
-                            if(LSQ.Address[ptr] == LSQ.Address[LSQindex] and LSQ.InstructionType[ptr] == "STORE") :
+                            if(LSQ.Address[ptr] == LSQ.Address[LSQindex] and LSQ.InstructionType[ptr] == "STORE" and LSQ.Complete[ptr] == 1) :
                                 # Forward result
                                 # ROB
                                 ROBindex = copy.copy(ROB.InstructionNumber.index(RS[1].Instruction[i].instructionNumber))
@@ -270,10 +270,13 @@ class Issue_Unit :
                     # Check for HALT
                     if(RS[2].Op[i] == "HALT") :
                         if(len(RS[0].Op) != 0 or len(RS[1].Op) != 0) :
+                            #print("here 1")
                             continue
                         if(IS_EX[0].Empty == False or IS_EX[1].Empty == False or IS_EX[2].Empty == False or IS_EX[3].Empty == False) :
+                            #print("here 2")
                             continue
                         if(ROB.CommitPtr != ROB.IssuePtr) :
+                            #print("here 3")
                             continue
 
                     # Try get all values, if cant then go to next instruction in queue

@@ -31,7 +31,9 @@ BIPB = BranchPipelineBuffer()               # Global Branch in Pipeline Buffer
 BTB = BranchTargetBuffer()                  # Gloabl Branch Target Buffer
 LSQ = LoadStoreQueue()                      # Global Load / Store Queue
 
-pipeline_0 = Pipeline()
+#pipeline_0 = Pipeline()
+pipelines = [Pipeline(), Pipeline(), Pipeline(), Pipeline()]
+
 
 if __name__=="__main__" :
     # Ensure file name was provided
@@ -44,6 +46,10 @@ if __name__=="__main__" :
 
     # Initialise values
     error = 0
+    nextInstructionNumber = 0
+
+
+    # Get branch prediction type
     branchPredType = 0                      # 0 = Off (default), 1 = Fixed, 2 = Static, 3 = 1-bit dynamic, 4 = 2-bit dynamic
     if("--BPFixed" in sys.argv) :
         branchPredType = 1
@@ -54,10 +60,23 @@ if __name__=="__main__" :
     if("--BPDynamic2" in sys.argv) :
         branchPredType = 4
 
+    # Get number of pipelines used
+    pipelineCount = 1
+    if("--2Way" in sys.argv) :
+        pipelineCount = 2
+    if("--4Way" in sys.argv) :
+        pipelineCount = 4
+    
+
     #Effective clock, advancing pipeline
     while not finished :
         instructionsExeThisCycle = instructionExecuteCount
-        PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, ROB, RAT, BIPB, BTB, LSQ, error = pipeline_0.advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, INSTR, ROB, RAT, BIPB, BTB, LSQ, branchPredType, error)
+
+        for i in range(0, pipelineCount) :
+            #print("pipeline " + str(i))
+            PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, ROB, RAT, BIPB, BTB, LSQ, error, pipelines, nextInstructionNumber = pipelines[i].advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, INSTR, ROB, RAT, BIPB, BTB, LSQ, branchPredType, error, pipelines, pipelineCount, nextInstructionNumber)
+
+        #PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, ROB, RAT, BIPB, BTB, LSQ, error, instructionToFlush = pipeline_0.advance(PC, instructionFetchCount, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount, finished, ARF, MEM, INSTR, ROB, RAT, BIPB, BTB, LSQ, branchPredType, error, instructionToFlush)
         cycles += 1
         instructionsExeThisCycle = instructionExecuteCount - instructionsExeThisCycle
         averageILP = round(instructionExecuteCount / cycles, 2)

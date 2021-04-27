@@ -6,7 +6,7 @@ from Register_File import *
 def printSysInfo(ARF, MEM, INSTR, RAT, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount) :
     np.set_printoptions(threshold=sys.maxsize, linewidth=300)
     tempMEM = np.reshape(MEM, (-1, 32))
-    os.system('cls||clear')
+    #os.system('cls||clear')
 
     print("│ PC = {} │ Cycles = {} │ Instructions Fetched = {} │ Instructions Executed = {} | Instructions Executed This Cycle = {} | Average IPC = {} |" .format(PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP))
     print("| Branches Executed = {} | Branches Taken = {} | Correct Branch Predictions = {} | Cycles Stalled = {} | Flushes = {} |" .format(branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount))

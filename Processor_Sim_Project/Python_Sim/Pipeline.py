@@ -138,8 +138,8 @@ class Pipeline:
                 indx = copy.copy(robIndex)
 
                 while True :
-                    indx = copy.copy((indx - 1 + 256) % 256) # reduce index by 1, if goes to negative loop around like ROB pointer does
-                    if(indx == (ROB.CommitPtr - 1 + 256) % 256) :
+                    indx = copy.copy((indx - 1 + 128) % 128) # reduce index by 1, if goes to negative loop around like ROB pointer does
+                    if(indx == (ROB.CommitPtr - 1 + 128) % 128) :
                         newRegAddr = copy.copy(reg)
                         break
                     if(ROB.Register[indx] == reg and ROB.InstructionNumber[indx] < instructionNumber) :
@@ -155,7 +155,7 @@ class Pipeline:
                 # Update ROB
                 ROB.Register[robIndex] = copy.copy("SKIP")
 
-            robIndex = copy.copy((robIndex + 1) % 256)
+            robIndex = copy.copy((robIndex + 1) % 128)
             
 
         # Flush BIPB (Branch in Pipeline Buffer)

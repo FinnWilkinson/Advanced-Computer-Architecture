@@ -32,10 +32,10 @@ class IS_EX_Reg :
 
 class ReOrderBuffer :
     def __init__(self) :
-        self.Register = [" "] * 256
-        self.InstructionNumber = [0] * 256
-        self.Value = [0] * 256
-        self.Complete = [0] * 256   # 0 = not completed, 1 = completed
+        self.Register = [" "] * 128
+        self.InstructionNumber = [0] * 128
+        self.Value = [0] * 128
+        self.Complete = [0] * 128   # 0 = not completed, 1 = completed
         self.CommitPtr = 0          # Points to index to write back to ARF next
         self.IssuePtr = 0           # Points to index to assign instruction to next
 

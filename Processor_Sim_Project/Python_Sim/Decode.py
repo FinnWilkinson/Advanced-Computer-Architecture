@@ -19,7 +19,7 @@ class Decode_Unit :
         # Get instruction from IF_DE
         nextInstruction = copy.copy(IF_DE.Instruction)
 
-        if(((ROB.IssuePtr + 1) % 256) == ROB.CommitPtr) :
+        if(((ROB.IssuePtr + 1) % 128) == ROB.CommitPtr) :
             return True, PC
 
         if(nextInstruction.opCode in self.loadStoreInstructions and ((LSQ.IssuePtr + 1) % 128) == LSQ.CommitPtr) :
@@ -105,7 +105,7 @@ class Decode_Unit :
 
         # Assign place in ROB
         ROBindex = copy.copy(ROB.IssuePtr)
-        ROB.IssuePtr = copy.copy((ROB.IssuePtr + 1) % 256)                                # mod 256 so tat index loops around
+        ROB.IssuePtr = copy.copy((ROB.IssuePtr + 1) % 128)                                # mod 128 so tat index loops around
         # If read only, change ROB register value assigning
         if(nextInstruction.opCode in self.readOnlyINSTR) :
             ROB.Register[ROBindex] = "SKIP"                                     # SKIP as we dont need to write back value

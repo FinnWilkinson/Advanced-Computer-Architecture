@@ -20,14 +20,14 @@ class Write_Back_Unit :
 
         # If read only instruction in place, move to next item in ROB
         if(ROB.Register[ROB.CommitPtr] == "SKIP") :
-            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 256)
+            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 128)
             return
 
         if(ROB.Complete[ROB.CommitPtr] == 1) :
             ARF.Register[int(ROB.Register[ROB.CommitPtr][1:])] = copy.copy(ROB.Value[ROB.CommitPtr])
             self.cleanUp(ROB, RAT, ROB.Register[ROB.CommitPtr]) 
             ROB.Register[ROB.CommitPtr] = "SKIP"
-            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 256)
+            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 128)
 
         return 
 
@@ -41,7 +41,7 @@ class Write_Back_Unit :
                 break
             if(ROB.Register[index] == reg) :
                 regCount += 1
-            index = copy.copy((index + 1) % 256)
+            index = copy.copy((index + 1) % 128)
 
         if(regCount == 1) :
             RAT.Address[int(reg[1:])] = reg

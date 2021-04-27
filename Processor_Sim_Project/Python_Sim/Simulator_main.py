@@ -81,7 +81,7 @@ if __name__=="__main__" :
         instructionsExeThisCycle = instructionExecuteCount - instructionsExeThisCycle
         averageILP = round(instructionExecuteCount / cycles, 2)
 
-        if(len(sys.argv) > 2 and "--verbose" in sys.argv) :
+        if(len(sys.argv) > 2 and "--Verbose" in sys.argv) :
             # Print initial system information at users discretion
             printSysInfo(ARF, MEM, INSTR, RAT, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)
         

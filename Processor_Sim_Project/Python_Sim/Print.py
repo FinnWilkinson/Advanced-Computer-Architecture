@@ -30,7 +30,7 @@ def printSysInfo(ARF, MEM, INSTR, RAT, PC, cycles, instructionFetchCount, instru
     print(tempMEM)
 
     print()
-    input("Press Enter key to continue ...")
+    #input("Press Enter key to continue ...")
 
 
 # If no file provided, print error and info

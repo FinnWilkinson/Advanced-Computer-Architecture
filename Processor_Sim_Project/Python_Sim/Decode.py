@@ -18,37 +18,19 @@ class Decode_Unit :
     def decode(self, IF_DE, RS, ARF, RAT, ROB, BIPB, BTB, PC, branchPredType, LSQ) :        
         # Get instruction from IF_DE
         nextInstruction = copy.copy(IF_DE.Instruction)
+        
+        # Flushing variables
+        needToFlush = False
+        flushOutput = -1
 
-        if(((ROB.IssuePtr + 1) % 128) == ROB.CommitPtr) :
-            return True, PC
+        # ROB values
+        d1 = 0
+        v1 = 0
+        v2 = 0
+        s1 = 0
+        s2 = 0
 
-        if(nextInstruction.opCode in self.loadStoreInstructions and ((LSQ.IssuePtr + 1) % 128) == LSQ.CommitPtr) :
-            return True, PC
-
-        # Get Reservation station ID
-        resID = 0
-        # Branch or Logic
-        if(nextInstruction.opCode in self.branchInstructions or nextInstruction.opCode in self.logicInstructions) :
-            if(len(RS[2].Instruction) < 8) :
-                resID = 2
-            else :
-                # Full so stall this cycle (return true) and return
-                return True, PC
-        # Load or Store
-        elif(nextInstruction.opCode in self.loadStoreInstructions) :
-            if(len(RS[1].Instruction) < 8) :
-               resID = 1
-            else :
-                # Full so stall this cycle (return true) and return
-                return True, PC
-        # Arithmetic
-        else :
-            if(len(RS[0].Instruction) < 16) :
-               resID = 0
-            else :
-                # Full so stall this cycle (return true) and return
-                return True, PC
-
+        # If branch, add to Branch Target Buffer and Branch in Pipeline Buffer
         if(branchPredType != 0) :
             # Branch Prediction
             if(nextInstruction.opCode in self.branchInstructions) :
@@ -75,16 +57,56 @@ class Decode_Unit :
                         BIPB.TargetAddress.append(copy.copy(int(nextInstruction.operand1)))
                         # Update PC to target address
                         PC = copy.copy(int(nextInstruction.operand1))
+                        needToFlush = True
+                        flushOutput = copy.copy(nextInstruction.instructionNumber)
                     elif(nextInstruction.opCode == "BEQ" or nextInstruction.opCode == "BLT") :
                         BTB.TargetAddress.append(copy.copy(int(nextInstruction.operand3)))
                         BIPB.TargetAddress.append(copy.copy(int(nextInstruction.operand3)))
                         # Update PC to target address
                         PC = copy.copy(int(nextInstruction.operand3))
+                        needToFlush = True
+                        flushOutput = copy.copy(nextInstruction.instructionNumber)
                     else :
                         # Need to update in Execute after register is read and address known
                         BTB.TargetAddress.append(0)
                         BIPB.TargetAddress.append(0)
-                
+                else :
+                    bipbindex = BIPB.InstructionNumber.index(nextInstruction.instructionNumber)
+                    BIPB.InstructionType[bipbindex] = copy.copy(nextInstruction.opCode)
+
+        # If ROB full, stall
+        if(((ROB.IssuePtr + 1) % 128) == ROB.CommitPtr) :
+            return True, PC, needToFlush, flushOutput
+
+        # If LSQ full and is a load or store, stall
+        if(nextInstruction.opCode in self.loadStoreInstructions and ((LSQ.IssuePtr + 1) % 128) == LSQ.CommitPtr) :
+            return True, PC, needToFlush, flushOutput
+
+
+        # Get Reservation station ID
+        resID = 0
+        # Branch or Logic
+        if(nextInstruction.opCode in self.branchInstructions or nextInstruction.opCode in self.logicInstructions) :
+            if(len(RS[2].Instruction) < 8) :
+                resID = 2
+            else :
+                # Full so stall this cycle (return true) and return
+                return True, PC, needToFlush, flushOutput
+        # Load or Store
+        elif(nextInstruction.opCode in self.loadStoreInstructions) :
+            if(len(RS[1].Instruction) < 8) :
+               resID = 1
+            else :
+                # Full so stall this cycle (return true) and return
+                return True, PC, needToFlush, flushOutput
+        # Arithmetic
+        else :
+            if(len(RS[0].Instruction) < 16) :
+               resID = 0
+            else :
+                # Full so stall this cycle (return true) and return
+                return True, PC, needToFlush, flushOutput
+
 
         # If load or store, Assign place in LSQ
         if(nextInstruction.opCode in self.loadStoreInstructions) :
@@ -99,13 +121,11 @@ class Decode_Unit :
                 LSQ.InstructionType[LSQindex] = copy.copy("LOAD")
             else :
                 LSQ.InstructionType[LSQindex] = copy.copy("STORE")
-            
-
 
 
         # Assign place in ROB
         ROBindex = copy.copy(ROB.IssuePtr)
-        ROB.IssuePtr = copy.copy((ROB.IssuePtr + 1) % 128)                                # mod 128 so tat index loops around
+        ROB.IssuePtr = copy.copy((ROB.IssuePtr + 1) % 128)                                # mod 128 so that index loops around
         # If read only, change ROB register value assigning
         if(nextInstruction.opCode in self.readOnlyINSTR) :
             ROB.Register[ROBindex] = "SKIP"                                     # SKIP as we dont need to write back value
@@ -114,14 +134,9 @@ class Decode_Unit :
             ROB.Register[ROBindex] = copy.copy(nextInstruction.operand1)        # Input actual register to write to
             ROB.Complete[ROBindex] = 0
             ROB.InstructionNumber[ROBindex] = copy.copy(nextInstruction.instructionNumber)
-            
 
-        # Read available values via RAT address & assign
-        d1 = 0
-        v1 = 0
-        v2 = 0
-        s1 = 0
-        s2 = 0
+
+        # Re-name and get ROB addresses/Values if available
         # Get d1 (operand 1) value if read only and available
         if(nextInstruction.opCode in self.readOnlyINSTR) :
             if("r" in str(nextInstruction.operand1)) :
@@ -159,7 +174,7 @@ class Decode_Unit :
                 v1 = 0
         else :
             # If operand 2 is a constant, get value
-            s1 = int(nextInstruction.operand2)
+            s1 = copy.copy(int(nextInstruction.operand2))
             v1 = 0
 
         # Get s2 value (operand 3) if available
@@ -180,14 +195,14 @@ class Decode_Unit :
                 v2 = 0
         else :
             # If operand 3 is a constant, get value
-            s2 = int(nextInstruction.operand3)
+            s2 = copy.copy(int(nextInstruction.operand3))
             v2 = 0
-        
 
         # Rename and update RAT
         if(nextInstruction.opCode not in self.readOnlyINSTR) :
             RAT.Address[int(nextInstruction.operand1[1:])] = copy.copy("ROB" + str(ROBindex))        # Update most recent physical address in RAT
             d1 = copy.copy("ROB" + str(ROBindex))
+
 
         # Add to correct RS
         RS[resID].Instruction.append(copy.copy(nextInstruction))
@@ -202,5 +217,4 @@ class Decode_Unit :
 
         # Set IF_DE to empty
         IF_DE.Empty = True
-
-        return False, PC
+        return False, PC, needToFlush, flushOutput

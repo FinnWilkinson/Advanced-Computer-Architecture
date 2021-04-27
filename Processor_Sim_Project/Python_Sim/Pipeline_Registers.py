@@ -1,5 +1,7 @@
 from Instruction import Instruction
+import copy as copy
 
+# Used in every pipeline
 class IF_DE_Reg :
     def __init__(self) :
         self.Empty = True
@@ -7,6 +9,7 @@ class IF_DE_Reg :
         self.InstructionPC = 0
 
 
+# Used in every pipeline
 class ReservationStation :
     def __init__(self) :
         self.Instruction = list()
@@ -19,6 +22,7 @@ class ReservationStation :
         self.S2 = list()                # Operand 3
 
 
+# Used in every pipeline
 class IS_EX_Reg :
     def __init__(self) :
         self.Empty = True
@@ -30,6 +34,7 @@ class IS_EX_Reg :
         self.S2 = 0                 # Operand 2
 
 
+# Global
 class ReOrderBuffer :
     def __init__(self) :
         self.Register = [" "] * 128
@@ -39,7 +44,40 @@ class ReOrderBuffer :
         self.CommitPtr = 0          # Points to index to write back to ARF next
         self.IssuePtr = 0           # Points to index to assign instruction to next
 
+    # Flush ROB after branch mis-predict
+    def flush(self, branchInstructionNumber, RAT) :
+        robIndex = copy.copy(self.CommitPtr)
+        while True :
+            if(robIndex == self.IssuePtr) :
+                break
+            if(self.InstructionNumber[robIndex] > branchInstructionNumber and self.Register[robIndex] != "SKIP") :
+                # Find last value for our reg, update RAT
+                reg = self.Register[robIndex]
+                newRegAddr = ""
+                indx = copy.copy(robIndex)
 
+                while True :
+                    indx = copy.copy((indx - 1 + 128) % 128) # reduce index by 1, if goes to negative loop around like ROB pointer does
+                    if(indx == (self.CommitPtr - 1 + 128) % 128) :
+                        newRegAddr = copy.copy(reg)
+                        break
+                    if(self.Register[indx] == reg and self.InstructionNumber[indx] < branchInstructionNumber) :
+                        newRegAddr = copy.copy("ROB" + str(indx))
+                        break
+                    else :
+                        if(self.CommitPtr == indx) :
+                            newRegAddr = copy.copy(reg)
+                            break
+                
+                # Update RAT
+                RAT.Address[int(reg[1:])] = copy.copy(newRegAddr)
+                # Update ROB
+                self.Register[robIndex] = copy.copy("SKIP")
+
+            robIndex = copy.copy((robIndex + 1) % 128)
+
+
+# Global
 class RegAddrTable :
     def __init__(self) :
         # Index of address = corresponding register in ARF i.e. index 3 = r3 address
@@ -47,6 +85,7 @@ class RegAddrTable :
         self.Address = ["r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23", "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31"]
 
 
+# Global
 class LoadStoreQueue :
     def __init__(self) :
         self.InstructionType = [" "] * 128
@@ -56,3 +95,15 @@ class LoadStoreQueue :
         self.Complete = [0] * 128   # 0 = not completed, 1 = completed
         self.CommitPtr = 0          # Points to index to write back to ARF next
         self.IssuePtr = 0           # Points to index to assign instruction to next
+
+    # Flush LSQ if branch mis-predict
+    def flush(self, branchInstructionNumber) :
+        ptr = copy.copy(self.CommitPtr)
+        while True :
+            if(ptr == self.IssuePtr) :
+                break
+            if(self.InstructionNumber[ptr] > branchInstructionNumber) :
+                self.Complete[ptr] = 1
+                self.Address[ptr] = -1
+                self.InstructionType[ptr] = copy.copy("SKIP")
+            ptr = copy.copy((ptr + 1) % 128)

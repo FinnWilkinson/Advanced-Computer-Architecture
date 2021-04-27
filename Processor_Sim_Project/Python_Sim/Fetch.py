@@ -35,6 +35,7 @@ class Fetch_Unit :
                 BIPB.InstructionNumber.append(copy.copy(nextInstruction.instructionNumber))
                 BIPB.Prediction.append(copy.copy(getBranchPred(branchPredType, BTB, btbIndex)))
                 BIPB.TargetAddress.append(copy.copy(BTB.TargetAddress[btbIndex]))
+                BIPB.InstructionType.append(" ")
                 # If predicted taken, update PC
                 if(getBranchPred(branchPredType, BTB, btbIndex) == True) :
                     PC = copy.copy(BTB.TargetAddress[btbIndex])

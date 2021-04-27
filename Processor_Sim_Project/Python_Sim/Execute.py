@@ -67,7 +67,7 @@ class ARITH_Execution_Unit :
         else: 
             print("ERROR - Opcode '{}' not recognised. Exiting..." .format(IS_EX[EUindex].Op))
             error = -1
-        return error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output, correctBranchPreds
+        return output, error, finished, branchTakenCount, branchExecutedCount, correctBranchPreds, PC, MEM
 
 
 # LOAD / STORE EXECUTION UNIT
@@ -79,7 +79,6 @@ class LDSTR_Execution_Unit :
     def executeInstruction(self, IS_EX, EUindex, ARF, MEM, PC, finished, branchExecutedCount, branchTakenCount, BIPB, BTB, branchPredType, correctBranchPreds, LSQ) :
         output = None
         error = 0
-
         # Introduce 2 cycle latency for Load and Stores (Replicating L1 cache latency)
         if(self.ExecutionCount == 1) :
             memAddress = copy.copy(IS_EX[EUindex].S1 + IS_EX[EUindex].S2)
@@ -103,7 +102,7 @@ class LDSTR_Execution_Unit :
         else :
             self.ExecutionCount += 1
             error = 2   # Cycle delay occured
-        return error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output, correctBranchPreds
+        return output, error, finished, branchTakenCount, branchExecutedCount, correctBranchPreds, PC, MEM
 
 
 # BRANCH / LOGIC EXECUTION UNIT
@@ -242,4 +241,4 @@ class BRLGC_Execution_Unit :
         else: 
             print("ERROR - Opcode '{}' not recognised. Exiting..." .format(IS_EX[EUindex].Op))
             error = -1
-        return error, PC, finished, branchExecutedCount, branchTakenCount, MEM, output, correctBranchPreds
+        return output, error, finished, branchTakenCount, branchExecutedCount, correctBranchPreds, PC, MEM

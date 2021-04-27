@@ -40,8 +40,25 @@ class BranchPipelineBuffer :
             if(self.InstructionNumber[i] == BranchInstructionNumber) :
                 self.BranchPC.pop(i)
                 self.InstructionNumber.pop(i)
+                self.InstructionType.pop(i)
                 self.Prediction.pop(i)
+                self.TargetAddress.pop(i)
                 break
+
+    def flush(self, branchInstructionNumber) :
+        currentIndex = 0
+        listLength = len(self.BranchPC)
+        while currentIndex < listLength :
+            if(self.InstructionNumber[currentIndex] > branchInstructionNumber) :
+                self.BranchPC.pop(currentIndex)
+                self.InstructionNumber.pop(currentIndex)
+                self.InstructionType.pop(currentIndex)
+                self.Prediction.pop(currentIndex)
+                self.TargetAddress.pop(currentIndex)
+                listLength -= 1
+            else :
+                currentIndex += 1
+    
 
 
 class BranchTargetBuffer :

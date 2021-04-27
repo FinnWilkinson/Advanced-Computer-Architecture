@@ -9,7 +9,7 @@ class Issue_Unit :
         return
 
 
-    def issue(self, RS, IS_EX, ARF, ROB, branchPredType, LSQ) :
+    def issue(self, RS, IS_EX, ARF, ROB, branchPredType, LSQ, pipelines, pipelineCount) :
         stallThisCycle = False
         instructionsIssued = 0
         ArithStall = False
@@ -184,12 +184,26 @@ class Issue_Unit :
                             # Value not ready, continue to next in list
                             continue
 
+                    # Ensure all previous un-committed store instructions have address calculated
+                    allAddrPresent = True
+                    currentPtr = copy.copy(LSQ.CommitPtr)
+                    while True :
+                        if(currentPtr == LSQ.IssuePtr) :
+                            break
+                        if(LSQ.Address[currentPtr] == -1 and LSQ.InstructionType[currentPtr] == "STORE" and LSQ.InstructionNumber[currentPtr] < RS[1].Instruction[i].instructionNumber) :
+                            allAddrPresent = False
+                            break
+                        currentPtr = copy.copy((currentPtr + 1) % 128)
+
+                    if(allAddrPresent == False) :
+                        continue
+
                     # As know all operands, can update address in LSQ
                     memAddress = copy.copy(RS[1].S1[i] + RS[1].S2[i])
                     LSQindex = copy.copy(LSQ.InstructionNumber.index(RS[1].Instruction[i].instructionNumber))
                     LSQ.Address[LSQindex] = copy.copy(memAddress)
                     
-                    # If no branch prediction
+                    # If no branch prediction and 1 pipeline
                     if(branchPredType == 0) :
                         # If no branch that preceeds it, Issue          Only with no branch prediction
                         preceedingBranch = False
@@ -204,46 +218,27 @@ class Issue_Unit :
                             stallThisCycle = True       # preceeding branch so stalled
                             break
 
-                    # Ensure all previous un-committed store instructions have address calculated
-                    allAddrPresent = True
-                    currentPtr = copy.copy(LSQ.CommitPtr)
+                    # If previous store has same address and isnt complete, dont issue
+                    canIssue = True
+                    currentPtr = copy.copy(LSQ.IssuePtr)
                     while True :
-                        if(currentPtr == LSQ.IssuePtr) :
+                        if(currentPtr == ((LSQ.CommitPtr - 1 + 128) % 128)) :
                             break
-                        if(LSQ.Address[currentPtr] == -1 and LSQ.InstructionType[currentPtr] == "STORE" and LSQ.InstructionNumber[currentPtr] < RS[1].Instruction[i].instructionNumber) :
-                            allAddrPresent = False
+                        if(LSQ.Address[currentPtr] == LSQ.Address[LSQindex] and LSQ.InstructionType[currentPtr] == "STORE" and LSQ.InstructionNumber[currentPtr] < RS[1].Instruction[i].instructionNumber and LSQ.Complete[currentPtr] == 0) :
+                            canIssue = False
                             break
-                        currentPtr = copy.copy((currentPtr + 1) % 128)
+                        currentPtr = copy.copy((currentPtr - 1 + 128) % 128)
 
-                    # If load, check no store ahead in LSQ that hasnt been committed.
-                    inLSQ = False
-                    if(RS[1].Op[i] == "LD" or RS[1].Op[i] == "LDC") :
-                        ptr = copy.copy(LSQindex-1)
-                        while True :
-                            if(LSQ.Address[ptr] == LSQ.Address[LSQindex] and LSQ.InstructionType[ptr] == "STORE" and LSQ.Complete[ptr] == 1) :
-                                # Forward result
-                                # ROB
-                                ROBindex = copy.copy(ROB.InstructionNumber.index(RS[1].Instruction[i].instructionNumber))
-                                ROB.Value[ROBindex] = copy.copy(LSQ.Value[ptr])
-                                ROB.Complete[ROBindex] = 1
-                                # LSQ
-                                LSQ.Value[LSQindex] = copy.copy(LSQ.Value[ptr])
-                                LSQ.Complete[LSQindex] = 1
-                                inLSQ = True
-                                break
-                            if(ptr == LSQ.CommitPtr) :
-                                # not in LSQ, continue as normal
-                                break
-                            ptr = copy.copy((ptr - 1 + 128) % 128)
+                    if(canIssue == False) :
+                        continue
 
-                    if(inLSQ == False) :
-                        # Issue to EU
-                        IS_EX[2].InstructionNumber = copy.copy(RS[1].Instruction[i].instructionNumber)
-                        IS_EX[2].Op = copy.copy(RS[1].Op[i])
-                        IS_EX[2].D1 = copy.copy(RS[1].D1[i])
-                        IS_EX[2].S1 = copy.copy(RS[1].S1[i])
-                        IS_EX[2].S2 = copy.copy(RS[1].S2[i])
-                        IS_EX[2].Empty = False
+                    # Issue to EU
+                    IS_EX[2].InstructionNumber = copy.copy(RS[1].Instruction[i].instructionNumber)
+                    IS_EX[2].Op = copy.copy(RS[1].Op[i])
+                    IS_EX[2].D1 = copy.copy(RS[1].D1[i])
+                    IS_EX[2].S1 = copy.copy(RS[1].S1[i])
+                    IS_EX[2].S2 = copy.copy(RS[1].S2[i])
+                    IS_EX[2].Empty = False
                     
                     # Remove from RS
                     RS[1].Instruction.pop(i)
@@ -269,14 +264,24 @@ class Issue_Unit :
                 for i in range(0, len(RS[2].Instruction)) :
                     # Check for HALT
                     if(RS[2].Op[i] == "HALT") :
-                        if(len(RS[0].Op) != 0 or len(RS[1].Op) != 0) :
-                            #print("here 1")
-                            continue
-                        if(IS_EX[0].Empty == False or IS_EX[1].Empty == False or IS_EX[2].Empty == False or IS_EX[3].Empty == False) :
-                            #print("here 2")
-                            continue
-                        if(ROB.CommitPtr != ROB.IssuePtr) :
-                            #print("here 3")
+                        canHalt = True
+                        # For each pipeline
+                        for m in range(0, pipelineCount) :
+                            # Check Reservation Stations empty
+                            if(len(pipelines[m].RS[0].Op) != 0 or len(pipelines[m].RS[1].Op) != 0) :
+                                canHalt = False
+                            # Check IS_EX empty
+                            if(pipelines[m].IS_EX[0].Empty == False or pipelines[m].IS_EX[1].Empty == False or pipelines[m].IS_EX[2].Empty == False or pipelines[m].IS_EX[3].Empty == False) :
+                                canHalt = False
+                        # Make sure ROB is finished committing
+                        robComplete = True
+                        for q in range(0, 128) :
+                            if("r" in ROB.Register[q]) :
+                                robComplete = False
+                                break
+                        if(robComplete == False) :
+                            canHalt = False
+                        if(canHalt == False) :
                             continue
 
                     # Try get all values, if cant then go to next instruction in queue

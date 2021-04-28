@@ -86,12 +86,12 @@ if __name__=="__main__" :
         instructionsExeThisCycle = instructionExecuteCount
         stallThisCycle = [False, False, False, False]
 
-        # Write Back
+        # WRITE BACK
         for w in range(0, pipelineCount) :
             writeBackUnit.writeBack(pipelines, pipelineCount, ROB, RAT, ARF, BIPB)    # ROB write back
             writeBackUnit.LSQCommit(LSQ, MEM, BIPB)                                   # LSQ write back
 
-        # Execute
+        # EXECUTE
         for e in range(0, pipelineCount) :
             #print(e)
             flushOutput = -1
@@ -125,12 +125,12 @@ if __name__=="__main__" :
             if(finished) :
                 break
 
-        # Issue
+        # ISSUE
         for i in range(0, pipelineCount) :
             stallThisCycle[i] = pipelines[i].issue(pipelines, pipelineCount, branchPredType, stallThisCycle[i], instructionFetchCount, ARF, ROB, LSQ)
 
 
-        # Decode - Instructions need to be re-named in order
+        # DECODE - Instructions need to be re-named in order
         pipelineDecodeVals = []
         # Get all instructions to decode next and sort into assending order
         for d in range(0, pipelineCount) :
@@ -160,7 +160,7 @@ if __name__=="__main__" :
                 break
             
 
-        # Fetch
+        # FETCH
         for f in range(0, pipelineCount) :
             instructionFetchCount, nextInstructionNumber, PC = pipelines[f].fetch(instructionFetchCount, nextInstructionNumber, branchPredType, PC, INSTR, BTB, BIPB)
 
@@ -174,6 +174,10 @@ if __name__=="__main__" :
         instructionsExeThisCycle = instructionExecuteCount - instructionsExeThisCycle
         averageILP = round(instructionExecuteCount / cycles, 2)
 
+# ##############################################
+#         if(instructionFetchCount == 189053) :
+#             finished = True
+# ##############################################
 
         # Check for verbose printing
         if(len(sys.argv) > 2 and "--Verbose" in sys.argv) :

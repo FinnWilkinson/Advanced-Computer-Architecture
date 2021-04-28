@@ -73,6 +73,7 @@ class ReOrderBuffer :
                 RAT.Address[int(reg[1:])] = copy.copy(newRegAddr)
                 # Update ROB
                 self.Register[robIndex] = copy.copy("SKIP")
+                self.InstructionNumber[robIndex] = copy.copy(-1)
 
             robIndex = copy.copy((robIndex + 1) % 128)
 

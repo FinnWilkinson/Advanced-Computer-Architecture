@@ -174,11 +174,6 @@ if __name__=="__main__" :
         instructionsExeThisCycle = instructionExecuteCount - instructionsExeThisCycle
         averageILP = round(instructionExecuteCount / cycles, 2)
 
-# ##############################################
-#         if(instructionFetchCount == 189053) :
-#             finished = True
-# ##############################################
-
         # Check for verbose printing
         if(len(sys.argv) > 2 and "--Verbose" in sys.argv) :
             printSysInfo(ARF, MEM, INSTR, RAT, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycle, averageILP, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)

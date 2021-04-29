@@ -1,0 +1,37 @@
+//Finds the factorial of the number 12 (i.e. 12!)
+//This is the largest number that fits in a 32-bit integer
+//MEM[0] = 12
+//Answer is in MEM[2]
+
+//Store value to memory
+ADDI r1, r0, 12
+STRC r1, r0, 0
+
+//output = 1
+//For value = 1 to 12
+//	output = output * value
+//return output
+
+
+//main loop added around core core (i.e. not initialising memory) to get a better ILP average
+//r23 used for loop max, r22 used for loop counter
+ADDI r23, r0, 100
+ADD r22, r0, r0
+Main:
+
+//r1 = value, 	r2 = output, 	r3 = 12 (max loop val)
+ADDI r1, r0, 1
+ADDI r2, r0, 1
+LDC r3, r0, 0
+
+Loop:
+BLT r3, r1, End
+MUL r2, r2, r1
+ADDI r1, r1, 1
+BR Loop
+
+End:
+STRC r2, r0, 2
+ADDI r22, r22, 1
+BLT r22, r23, Main
+HALT 

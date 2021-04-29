@@ -3,15 +3,14 @@ import copy as copy
 
 class Issue_Unit :
     def __init__(self) :
-        self.readOnlyINSTR = ["STR", "STRC", "JMP", "BR", "BEQ", "BLT", "HALT"]
+        self.readOnlyINSTR = ["STR", "STRC", "JMP", "BR", "BEQ", "BLT", "HALT", "PAUSE"]
         self.branchInstructions = ["JMP", "BR", "BEQ", "BLT"]
         self.nextInstruction = 0
         return
 
 
-    def issue(self, RS, IS_EX, ARF, ROB, branchPredType, LSQ, pipelines, pipelineCount) :
+    def issue(self, RS, IS_EX, ARF, ROB, branchPredType, LSQ, pipelines, pipelineCount, ROBsize) :
         stallThisCycle = False
-        instructionsIssued = 0
         ArithStall = False
 
         # Only issue instructions that have all operands Valid
@@ -275,7 +274,7 @@ class Issue_Unit :
                                 canHalt = False
                         # Make sure ROB is finished committing
                         robComplete = True
-                        for q in range(0, 128) :
+                        for q in range(0, ROBsize) :
                             if("r" in ROB.Register[q]) :
                                 robComplete = False
                                 break

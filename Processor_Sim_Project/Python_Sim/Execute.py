@@ -27,7 +27,7 @@ class ARITH_Execution_Unit :
         # MUL
         elif IS_EX[EUindex].Op == "MUL": 
             # Introduce 3 cycle latency for Multiplication
-            if(self.ExecutionCount == 2) :
+            if(self.ExecutionCount == 1) :
                 output = IS_EX[EUindex].S1 * IS_EX[EUindex].S2
                 self.ExecutionCount = 0     # Re-set execution count
             else :
@@ -36,7 +36,7 @@ class ARITH_Execution_Unit :
         # MULI
         elif IS_EX[EUindex].Op == "MULI": 
             # Introduce 3 cycle latency for Multiplication
-            if(self.ExecutionCount == 2) :
+            if(self.ExecutionCount == 1) :
                 output = IS_EX[EUindex].S1 * IS_EX[EUindex].S2
                 self.ExecutionCount = 0     # Re-set execution count
             else :
@@ -73,35 +73,27 @@ class ARITH_Execution_Unit :
 # LOAD / STORE EXECUTION UNIT
 class LDSTR_Execution_Unit :
     def __init__(self) :
-        self.ExecutionCount = 0
         return
 
     def executeInstruction(self, IS_EX, EUindex, ARF, MEM, PC, finished, branchExecutedCount, branchTakenCount, BIPB, BTB, branchPredType, correctBranchPreds, LSQ) :
         output = None
         error = 0
-        # Introduce 2 cycle latency for Load and Stores (Replicating L1 cache latency)
-        if(self.ExecutionCount == 1) :
-            memAddress = copy.copy(IS_EX[EUindex].S1 + IS_EX[EUindex].S2)
-            # LD or LDC
-            if IS_EX[EUindex].Op == "LD" or IS_EX[EUindex].Op == "LDC" : 
-                output = copy.copy(MEM[memAddress])
-                LSQindex = LSQ.InstructionNumber.index(IS_EX[EUindex].InstructionNumber)
-                LSQ.Value[LSQindex] = copy.copy(output)
-                LSQ.Complete[LSQindex] = 1
-            # STR or STRC
-            elif IS_EX[EUindex].Op == "STR" or IS_EX[EUindex].Op == "STRC" : 
-                LSQindex = LSQ.InstructionNumber.index(IS_EX[EUindex].InstructionNumber)
-                LSQ.Value[LSQindex] = copy.copy(IS_EX[EUindex].D1)
-                LSQ.Complete[LSQindex] = 1
-            # Opcode not recognised
-            else: 
-                print("ERROR - Opcode '{}' not recognised. Exiting..." .format(IS_EX[EUindex].Op))
-                error = -1
-            self.ExecutionCount = 0     # Re-set execution count
-
-        else :
-            self.ExecutionCount += 1
-            error = 2   # Cycle delay occured
+        memAddress = copy.copy(IS_EX[EUindex].S1 + IS_EX[EUindex].S2)
+        # LD or LDC
+        if IS_EX[EUindex].Op == "LD" or IS_EX[EUindex].Op == "LDC" : 
+            output = copy.copy(MEM[memAddress])
+            LSQindex = LSQ.InstructionNumber.index(IS_EX[EUindex].InstructionNumber)
+            LSQ.Value[LSQindex] = copy.copy(output)
+            LSQ.Complete[LSQindex] = 1
+        # STR or STRC
+        elif IS_EX[EUindex].Op == "STR" or IS_EX[EUindex].Op == "STRC" : 
+            LSQindex = LSQ.InstructionNumber.index(IS_EX[EUindex].InstructionNumber)
+            LSQ.Value[LSQindex] = copy.copy(IS_EX[EUindex].D1)
+            LSQ.Complete[LSQindex] = 1
+        # Opcode not recognised
+        else: 
+            print("ERROR - Opcode '{}' not recognised. Exiting..." .format(IS_EX[EUindex].Op))
+            error = -1
         return output, error, finished, branchTakenCount, branchExecutedCount, correctBranchPreds, PC, MEM
 
 
@@ -225,18 +217,21 @@ class BRLGC_Execution_Unit :
                         BTB.updateResult(btbIndex, taken)
                         break
 
-        #LSL
+        # LSL
         elif IS_EX[EUindex].Op == "LSL":
             output = IS_EX[EUindex].S1 << IS_EX[EUindex].S2
-        #LSR
+        # LSR
         elif IS_EX[EUindex].Op == "LSR":
             output = IS_EX[EUindex].S1 >> IS_EX[EUindex].S2
-        #XOR
+        # XOR
         elif IS_EX[EUindex].Op == "XOR" :
             output = IS_EX[EUindex].S1 ^ IS_EX[EUindex].S2
-        #AND
+        # AND
         elif IS_EX[EUindex].Op == "AND" :
             output = IS_EX[EUindex].S1 & IS_EX[EUindex].S2
+        # PAUSE
+        elif IS_EX[EUindex].Op == "PAUSE" :
+            output = 1
         # Opcode not recognised
         else: 
             print("ERROR - Opcode '{}' not recognised. Exiting..." .format(IS_EX[EUindex].Op))

@@ -12,10 +12,10 @@ class Decode_Unit :
     def __init__(self) :
         self.branchInstructions = ["JMP", "BR", "BEQ", "BLT"]
         self.loadStoreInstructions = ["LD", "LDC", "STR", "STRC"]
-        self.logicInstructions = ["HALT", "LSL", "LSR", "AND", "XOR", "CMP"]
-        self.readOnlyINSTR = ["STR", "STRC", "JMP", "BR", "BEQ", "BLT", "HALT"]
+        self.logicInstructions = ["HALT", "LSL", "LSR", "AND", "XOR", "CMP", "PAUSE"]
+        self.readOnlyINSTR = ["STR", "STRC", "JMP", "BR", "BEQ", "BLT", "HALT", "PAUSE"]
 
-    def decode(self, IF_DE, RS, ARF, RAT, ROB, BIPB, BTB, PC, branchPredType, LSQ) :        
+    def decode(self, IF_DE, RS, ARF, RAT, ROB, BIPB, BTB, PC, branchPredType, LSQ, ROBsize) :        
         # Get instruction from IF_DE
         nextInstruction = copy.copy(IF_DE.Instruction)
         
@@ -75,7 +75,7 @@ class Decode_Unit :
                     BIPB.InstructionType[bipbindex] = copy.copy(nextInstruction.opCode)
 
         # If ROB full, stall
-        if(((ROB.IssuePtr + 1) % 128) == ROB.CommitPtr) :
+        if(((ROB.IssuePtr + 1) % ROBsize) == ROB.CommitPtr) :
             return True, PC, needToFlush, flushOutput
 
         # If LSQ full and is a load or store, stall
@@ -125,10 +125,13 @@ class Decode_Unit :
 
         # Assign place in ROB
         ROBindex = copy.copy(ROB.IssuePtr)
-        ROB.IssuePtr = copy.copy((ROB.IssuePtr + 1) % 128)                                # mod 128 so that index loops around
+        ROB.IssuePtr = copy.copy((ROB.IssuePtr + 1) % ROBsize)                                # mod ROBsize so that index loops around
         # If read only, change ROB register value assigning
         if(nextInstruction.opCode in self.readOnlyINSTR) :
             ROB.Register[ROBindex] = "SKIP"                                     # SKIP as we dont need to write back value
+            if(nextInstruction.opCode == "PAUSE") :
+                ROB.Register[ROBindex] = "PAUSE"
+                ROB.InstructionNumber[ROBindex] = copy.copy(nextInstruction.instructionNumber)
             ROB.Complete[ROBindex] = 1                                          # Completed as nothing to write back or read from
         else :  
             ROB.Register[ROBindex] = copy.copy(nextInstruction.operand1)        # Input actual register to write to

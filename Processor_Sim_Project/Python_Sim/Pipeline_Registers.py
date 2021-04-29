@@ -36,16 +36,16 @@ class IS_EX_Reg :
 
 # Global
 class ReOrderBuffer :
-    def __init__(self) :
-        self.Register = [" "] * 128
-        self.InstructionNumber = [0] * 128
-        self.Value = [0] * 128
-        self.Complete = [0] * 128   # 0 = not completed, 1 = completed
+    def __init__(self, ROBsize) :
+        self.Register = [" "] * ROBsize
+        self.InstructionNumber = [0] * ROBsize
+        self.Value = [0] * ROBsize
+        self.Complete = [0] * ROBsize   # 0 = not completed, 1 = completed
         self.CommitPtr = 0          # Points to index to write back to ARF next
         self.IssuePtr = 0           # Points to index to assign instruction to next
 
     # Flush ROB after branch mis-predict
-    def flush(self, branchInstructionNumber, RAT) :
+    def flush(self, branchInstructionNumber, RAT, ROBsize) :
         robIndex = copy.copy(self.CommitPtr)
         while True :
             if(robIndex == self.IssuePtr) :
@@ -57,8 +57,8 @@ class ReOrderBuffer :
                 indx = copy.copy(robIndex)
 
                 while True :
-                    indx = copy.copy((indx - 1 + 128) % 128) # reduce index by 1, if goes to negative loop around like ROB pointer does
-                    if(indx == (self.CommitPtr - 1 + 128) % 128) :
+                    indx = copy.copy((indx - 1 + ROBsize) % ROBsize) # reduce index by 1, if goes to negative loop around like ROB pointer does
+                    if(indx == (self.CommitPtr - 1 + ROBsize) % ROBsize) :
                         newRegAddr = copy.copy(reg)
                         break
                     if(self.Register[indx] == reg and self.InstructionNumber[indx] < branchInstructionNumber) :
@@ -70,12 +70,13 @@ class ReOrderBuffer :
                             break
                 
                 # Update RAT
-                RAT.Address[int(reg[1:])] = copy.copy(newRegAddr)
+                if("r" in reg) :
+                    RAT.Address[int(reg[1:])] = copy.copy(newRegAddr)
                 # Update ROB
                 self.Register[robIndex] = copy.copy("SKIP")
                 self.InstructionNumber[robIndex] = copy.copy(-1)
 
-            robIndex = copy.copy((robIndex + 1) % 128)
+            robIndex = copy.copy((robIndex + 1) % ROBsize)
 
 
 # Global

@@ -7,18 +7,18 @@ class Write_Back_Unit :
         self.nextInstruction = 0
         self.noWriteBack = ["STR", "STRC", "JMP", "BR", "BLT", "BEQ"]
         self.readOnlyINSTR = ["STR", "STRC", "JMP", "BR", "BEQ", "BLT", "HALT"]
-
         return
 
-    def writeBack(self, pipelines, pipelineCount, ROB, RAT, ARF, BIPB) :
+    def writeBack(self, pipelines, pipelineCount, ROB, RAT, ARF, BIPB, ROBsize) :
+        toPrint = False
         # If caught up to issue ptr, do nothing
         if(ROB.CommitPtr == ROB.IssuePtr) :
-            return
+            return toPrint
 
         # If branch in BIPB that is less than next to commit, wait for it to execute
         for i in range(0, len(BIPB.BranchPC)) :
             if(ROB.InstructionNumber[ROB.CommitPtr] > BIPB.InstructionNumber[i]) :
-                return
+                return toPrint
 
         # If read only instruction in place, move to next item in ROB
         if(ROB.Register[ROB.CommitPtr] == "SKIP") :
@@ -28,8 +28,19 @@ class Write_Back_Unit :
             ROB.Value[ROB.CommitPtr] = copy.copy(0)
             ROB.Complete[ROB.CommitPtr] = copy.copy(0)
             # Increment Commit Ptr
-            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 128)
-            return
+            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % ROBsize)
+            return toPrint
+
+        if(ROB.Register[ROB.CommitPtr] == "PAUSE") :
+            toPrint = True
+            # Re-set ROB record
+            ROB.Register[ROB.CommitPtr] = copy.copy(" ")
+            ROB.InstructionNumber[ROB.CommitPtr] = copy.copy(0)
+            ROB.Value[ROB.CommitPtr] = copy.copy(0)
+            ROB.Complete[ROB.CommitPtr] = copy.copy(0)
+            # Increment Commit Ptr
+            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % ROBsize)
+            return toPrint
 
         if(ROB.Complete[ROB.CommitPtr] == 1) :
             # Save Value to ARF
@@ -37,15 +48,16 @@ class Write_Back_Unit :
             # Forward value to all reservation stations
             self.forwardVal(pipelines, pipelineCount, ROB)
             # Update RAT if needed
-            self.cleanUp(ROB, RAT, ROB.Register[ROB.CommitPtr])
+            self.cleanUp(ROB, RAT, ROB.Register[ROB.CommitPtr], ROBsize)
             # Re-set ROB record
             ROB.Register[ROB.CommitPtr] = copy.copy(" ")
             ROB.InstructionNumber[ROB.CommitPtr] = copy.copy(0)
             ROB.Value[ROB.CommitPtr] = copy.copy(0)
             ROB.Complete[ROB.CommitPtr] = copy.copy(0) 
             # Increment Commit Ptr
-            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % 128)
+            ROB.CommitPtr = copy.copy((ROB.CommitPtr + 1) % ROBsize)
 
+        return toPrint
 
 
     # Forward value to any waiting instructions in all RS
@@ -69,7 +81,7 @@ class Write_Back_Unit :
 
 
     # If last in ROB to write to register, Set RAT address to be "rx"
-    def cleanUp(self, ROB, RAT, reg) :
+    def cleanUp(self, ROB, RAT, reg, ROBsize) :
         # Look between CommitPtr and IssuePtr for any other use of reg, if none then reset RAT address
         index = copy.copy(ROB.CommitPtr)
         regCount = 0
@@ -78,7 +90,7 @@ class Write_Back_Unit :
                 break
             if(ROB.Register[index] == reg) :
                 regCount += 1
-            index = copy.copy((index + 1) % 128)
+            index = copy.copy((index + 1) % ROBsize)
 
         # If last of instruction to that register
         if(regCount == 1) :

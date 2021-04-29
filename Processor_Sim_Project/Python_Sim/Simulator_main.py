@@ -21,11 +21,13 @@ flushCount = 0
 instructionsExeThisCycle = 0
 averageILP = 0.0
 
+ROBsize = 128
+
 ARF = ARegFile()                            # Register file. ARF[0] or r0 is always = 0
 MEM = [0] * 1024                            # Data memory
 INSTR = [Instruction(0,0,0,0,0)] * 1024     # Instruction memory
 
-ROB = ReOrderBuffer()                       # Global Re-order Buffer
+ROB = ReOrderBuffer(ROBsize)                # Global Re-order Buffer
 RAT = RegAddrTable()                        # Global Register Address Table
 
 BIPB = BranchPipelineBuffer()               # Global Branch in Pipeline Buffer
@@ -35,12 +37,6 @@ LSQ = LoadStoreQueue()                      # Global Load / Store Queue
 pipelines = [Pipeline(), Pipeline(), Pipeline(), Pipeline()]
 
 writeBackUnit = Write_Back_Unit()
-
-# Flush processor after branch mispredict
-def flushAll(flushOutput, nextInstructionNumber, flushCount,) :
-    
-
-    return nextInstructionNumber
 
 
 
@@ -80,20 +76,35 @@ if __name__=="__main__" :
         branchPredType = 3
     if("--BPDynamic2" in sys.argv) :
         branchPredType = 4
+
+    # Get ROB size
+    for i in range(0, len(sys.argv)) :
+        if("--ROB" in sys.argv[i]) :
+            ROBsize = int(sys.argv[i][5:])
+            ROB = ReOrderBuffer(ROBsize)
     
     # Effective clock, used to advance the pipelines
     while not finished :
         instructionsExeThisCycle = instructionExecuteCount
         stallThisCycle = [False, False, False, False]
+        toPrint = False
 
         # WRITE BACK
         for w in range(0, pipelineCount) :
-            writeBackUnit.writeBack(pipelines, pipelineCount, ROB, RAT, ARF, BIPB)    # ROB write back
+            toPrint = writeBackUnit.writeBack(pipelines, pipelineCount, ROB, RAT, ARF, BIPB, ROBsize)    # ROB write back
             writeBackUnit.LSQCommit(LSQ, MEM, BIPB)                                   # LSQ write back
+
+            # Check if we need to print system info
+            if(toPrint == True) :
+                toPrint = False
+                instructionsExeThisCycleTemp = instructionExecuteCount - instructionsExeThisCycle
+                averageILPTemp = round(instructionExecuteCount / cycles, 2)
+                printSysInfo(ARF, MEM, INSTR, RAT, PC, cycles, instructionFetchCount, instructionExecuteCount, instructionsExeThisCycleTemp, averageILPTemp, branchExecutedCount, branchTakenCount, correctBranchPreds, stallCount, flushCount)
+
+
 
         # EXECUTE
         for e in range(0, pipelineCount) :
-            #print(e)
             flushOutput = -1
             error, finished, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, flushOutput, PC, MEM = pipelines[e].execute(error, finished, instructionExecuteCount, branchExecutedCount, branchTakenCount, correctBranchPreds, branchPredType, flushOutput, pipelines, pipelineCount, PC, MEM, ARF, ROB, BTB, BIPB, LSQ)
             # Check if opCode error
@@ -109,7 +120,7 @@ if __name__=="__main__" :
                 for f in range(0, pipelineCount) :
                     nextInstructionNumber = pipelines[f].flush(flushOutput, nextInstructionNumber)
                 # Flush ROB and re-assign RAT values
-                ROB.flush(flushOutput, RAT)
+                ROB.flush(flushOutput, RAT, ROBsize)
                 # Flush LSQ
                 LSQ.flush(flushOutput)
                 # Flush BIPB
@@ -127,7 +138,7 @@ if __name__=="__main__" :
 
         # ISSUE
         for i in range(0, pipelineCount) :
-            stallThisCycle[i] = pipelines[i].issue(pipelines, pipelineCount, branchPredType, stallThisCycle[i], instructionFetchCount, ARF, ROB, LSQ)
+            stallThisCycle[i] = pipelines[i].issue(pipelines, pipelineCount, branchPredType, stallThisCycle[i], instructionFetchCount, ARF, ROB, LSQ, ROBsize)
 
 
         # DECODE - Instructions need to be re-named in order
@@ -139,14 +150,14 @@ if __name__=="__main__" :
         # Execute Decode in program order
         for d in pipelineDecodeVals :
             tempStallIndicatorDE = False
-            tempStallIndicatorDE, PC, needToFlush, flushOutput = pipelines[d[1]].decode(branchPredType, tempStallIndicatorDE, instructionFetchCount, PC, ARF, RAT, ROB, BTB, BIPB, LSQ)
+            tempStallIndicatorDE, PC, needToFlush, flushOutput = pipelines[d[1]].decode(branchPredType, tempStallIndicatorDE, instructionFetchCount, PC, ARF, RAT, ROB, BTB, BIPB, LSQ, ROBsize)
             # Check if BTB updated, prediction made and so need to flush
             if(needToFlush == True) :
                 # Flush Pipelines
                 for f in range(0, pipelineCount) :
                     nextInstructionNumber = pipelines[f].flush(flushOutput, nextInstructionNumber)
                 # Flush ROB and re-assign RAT values
-                ROB.flush(flushOutput, RAT)
+                ROB.flush(flushOutput, RAT, ROBsize)
                 # Flush LSQ
                 LSQ.flush(flushOutput)
                 # Flush BIPB
@@ -168,6 +179,7 @@ if __name__=="__main__" :
         for s in range(0, pipelineCount) :
             if(stallThisCycle[s] == True) :
                 stallCount += 1
+                break
 
         # Update values
         cycles += 1

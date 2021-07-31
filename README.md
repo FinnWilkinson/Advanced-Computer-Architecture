@@ -1,30 +1,24 @@
 # Advanced Computer Architecture
  
- This repository contains my final year coursework project to make a emulation of a processor. I have written the simulator in Python.
-
- To compile and run the simulator: `python Simulator_main.py "Assembly Programs/<CHOSEN_PROGRAM>.txt"` in the Python_Sim directory. 
-
- To compile and run the simulator with status update after each instruction execution: `python Simulator_main.py "Assembly Programs/<CHOSEN_PROGRAM>.txt" -verbose` 
- in the Python_Sim directory. 
+This repository contains my final year coursework project to make an emulation of either a scalar, or a super scalar out-of-order pipelined processor. Details of compilation, as well as the project code, can be found in the `Processor_Sim_Project/Python_Sim/` directory of this repository. 
 
 
+ The following assembly programs are available to run, and are loacted within the `Assembly_Programs` sub-directory of the project. 
  All Assembly programs contain comments at the top to help explain what the script will do.
- Available Assembly test programs :
-  - `Quick_Sort.txt`
-  - `Vector_Addition.txt`
-  - `Factorial.txt`
-  
-
- The external Dependancies are as follows :
-  - `import os`
-  - `import sys`
-  - `import numpy as np`
+ - Factorial.txt
+ - Game_Of_Life.txt
+ - Matrix_Multiplication.txt
+ - Matrix_Multiplication_Unrolled.txt
+ - Max_Throughput_Test.txt
+ - Qucik_Sort.txt
+ - Test_Script.txt
+ - Vecotr_Addition.txt
 
 
- `Processor_Sim` contains the code for a simple scalar processor, which can read in instruction files (`.txt` format) and produce an output.
- The instructions set is as follows (also found in `Instructions.txt`):
+ The custom instructions set is as follows :
  | Instruction       | Description                                                                                                                                 
  | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------
+ | `HALT`            |  finished = 1
  | `ADD rd, ra, rb`  |  RF[rd] = RF[ra] + RF[rb]                                                                                                                   
  | `ADDI rd, ra, x`  |  RF[rd] = RF[ra] + x                                                                                    
  | `SUB rd, ra, rb`  |  RF[rd] = RF[ra] - RF[rb]                                                                                                                   
@@ -32,17 +26,22 @@
  | `MUL rd, ra, rb`  |  RF[rd] = RF[ra] * RF[rb]                                                                                            
  | `MULI rd, ra, x`  |  RF[rd] = RF[ra] * x                                                           
  | `DIV rd, ra, rb`  |  RF[rd] = RF[ra] / RF[rb]                                                      
- | `DIVI rd, ra, x`  |  RF[rd] = RF[ra] / x                                                            
- | `LD rd, ra, x`    |  RF[rd] = MEM[ RF[ra] + x ]                                                    
- | `LDC rd, x`       |  RF[rd] = MEM[ x ]                                                             
- | `STR ra, rd, x`   |  MEM[ RF[rd] + x ] = RF[ra]                                                    
- | `STRC ra, x`      |  MEM[ x ] = RF[ra]                                                             
+ | `DIVI rd, ra, x`  |  RF[rd] = RF[ra] / x      (Rounds to nearest integer)                                                            
+ | `LD rd, ra, rb`   |  RF[rd] = MEM[ RF[ra] + RF[rb] ]                                                    
+ | `LDC rd, ra, x`   |  RF[rd] = MEM[ RF[ra] + x ]                                                             
+ | `STR ra, rd1, rd2`|  MEM[ RF[rd1] + RF[rd2] ] = RF[ra]                                                    
+ | `STRC ra, rd, x`  |  MEM[ RF[rd] + x ] = RF[ra]                                                             
  | `CMP rd, ra, rb`  |  if RF[ra] > RF[rb] then RF[rd] = 1; if RF[ra] = RF[rb] then RF[rd] = 0; if RF[ra] < RF[rb] then RF[rd] = -1;
- | `JMP ra`           |  PC = RF[ra]                                   
+ | `JMP ra`          |  PC = RF[ra]                                   
  | `BR x`            |  PC = x                                    
  | `BEQ ra, rb, x`   |  if RF[ra] = RF[rb] then PC = x;           
- | `BLT ra, rb, x`   |  if RF[ra] < RF[rb] then PC = x;           
- | `HALT`            |  finished = 1
+ | `BLT ra, rb, x`   |  if RF[ra] < RF[rb] then PC = x; 
+ | `LSL rd, ra, x`   |  RF[rd] = RF[ra] << x
+ | `LSR rd, ra, x`   |  RF[rd] = RF[ra] >> x
+ | `XOR rd, ra, rb`  |  RF[rd] = RF[ra] XOR RF[rb]
+ | `AND rd, ra, rb`  |  RF[rd] = RF[ra] AND RF[rb]
+ | `MOD rd, ra, rb`  |  RF[rd] = RF[ra] MOD RF[rb]
+ | `PAUSE`           |  Print out the processor state
 
 Noting that:
  - `x` is treated as an immediate constant.
@@ -50,23 +49,12 @@ Noting that:
  - `RF` is the Register File / Array of General Purpose Registers. (In C it is defined as `int RF[32];`)
  - `RF[0]` or `r0` is always `0`.
  - `MEM[a]` is memory item at address `a`. (In C it is defined as `int MEM[1024];`)
+ - When branching, labels can be used and referenced in the assembly code to denote functions as follows :
+   - `Label:`
+   - `ADD r4, r5, r6`
+   - ...
+   - `BR Label`
 
-
-
- I have created a structure in order to hold the opcode and operands, which is defined as :
- ``` c
- struct instruction
- {
-     string opCode;
-     string operand1;
-     string operand2;
-     string operand3;
- };
- ```
- Once instructions are read in, they are saved to a seperate instruction memory array, which in the source code is defined as `struct instruction INSTR[512];`.
- All opcodes and operands are treated as 32-bit integers, rather than combining them into a single 32-bit operation. 
- This decision was taken (in addition to it being in the coursework specification) to make the project simpler to code, 
- and adding this bit manipulation does not add anything to the simulator in terms of what it can do 
- (i.e. its functionality does not change, only its complexity to understand and to code). 
+A presentation titled *slides.pdf* can also be found in the project directory. Contained within this presentation is a graphical representation of the super scalar processor, as well as key features and various experiments that were run.
 
  
